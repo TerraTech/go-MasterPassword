@@ -22,7 +22,7 @@ const master_password_seed = "com.lyndir.masterpassword"
 const Master_password_types = "maximum, long, medium, short, basic, pin"
 
 type MasterPW struct {
-	Counter uint
+	Counter uint32
 	PWtype string
 	Fullname string
 	Password string
@@ -57,15 +57,15 @@ var template_characters = map[byte]string{
 // NewMasterPassword returns a new empty MasterPW struct with counter==1 and pwtype=="long"
 func NewMasterPassword() *MasterPW {
 	return &MasterPW{
-		counter: 1,
-		pwtype: "long",
+		Counter: 1,
+		PWtype: "long",
 	}
 }
 
 // MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
 // Valid password_types: maximum, long, medium, short, basic, pin
 func (m *MasterPW) MasterPassword() (string, error) {
-	return MasterPassword(m.counter, m.pwtype, m.fullname, m.password, m.site)
+	return MasterPassword(m.Counter, m.PWtype, m.Fullname, m.Password, m.Site)
 }
 
 func (m *MasterPW) IsValidPWtype(password_type string) bool {
