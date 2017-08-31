@@ -17,10 +17,15 @@ import (
 	"golang.org/x/crypto/scrypt"
 )
 
-const master_password_seed = "com.lyndir.masterpassword"
-// Valid password types
+// MpwSeries denotes the mpw cli client version compatibility.
+//   This is mostly for tracking the password type templates.
+const MpwSeries = "2.5.x"
+// MpwPasswordTypes is for listing the current supported password types.
 const Master_password_types = "maximum, long, medium, short, basic, pin"
 
+const master_password_seed = "com.lyndir.masterpassword"
+
+// MasterPW contains all relevant items for MasterPassword to act upon.
 type MasterPW struct {
 	Counter uint32
 	PWtype string
