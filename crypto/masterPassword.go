@@ -18,6 +18,16 @@ import (
 )
 
 const master_password_seed = "com.lyndir.masterpassword"
+// Valid password types
+const Master_password_types = "maximum, long, medium, short, basic, pin"
+
+type MasterPW struct {
+	Counter uint
+	PWtype string
+	Fullname string
+	Password string
+	Site string
+}
 
 var password_type_templates = map[string][][]byte{
 	"maximum": {[]byte("anoxxxxxxxxxxxxxxxxx"), []byte("axxxxxxxxxxxxxxxxxno")},
@@ -44,7 +54,27 @@ var template_characters = map[byte]string{
 	'x': "AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz0123456789!@#$%^&*()",
 }
 
+// NewMasterPassword returns a new empty MasterPW struct with counter==1 and pwtype=="long"
+func NewMasterPassword() *MasterPW {
+	return &MasterPW{
+		counter: 1,
+		pwtype: "long",
+	}
+}
+
 // MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
+// Valid password_types: maximum, long, medium, short, basic, pin
+func (m *MasterPW) MasterPassword() (string, error) {
+	return MasterPassword(m.counter, m.pwtype, m.fullname, m.password, m.site)
+}
+
+func (m *MasterPW) IsValidPWtype(password_type string) bool {
+	_, exists := password_type_templates[password_type]
+	return exists
+}
+
+// MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
+// Valid password_types: maximum, long, medium, short, basic, pin
 func MasterPassword(counter uint32, password_type, user, password, site string) (string, error) {
 	templates := password_type_templates[password_type]
 	if templates == nil {
