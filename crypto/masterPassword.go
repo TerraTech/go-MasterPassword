@@ -18,14 +18,6 @@
 // LICENSE file.  Alternatively, see <http://www.gnu.org/licenses/>.
 //==============================================================================
 
-/*
- *   Attributions:
- *     Maarten Billemont
- *       http://masterpasswordapp.com
- *     technosophos
- *       Derived from Materminds/sprig: crypto.go/derivePassword()
- */
-
 package crypto
 
 import (
