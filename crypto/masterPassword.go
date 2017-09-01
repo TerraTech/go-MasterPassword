@@ -34,38 +34,42 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"fmt"
+	"sort"
 
 	"golang.org/x/crypto/scrypt"
 )
 
 // MpwSeries denotes the mpw cli client version compatibility.
 //   This is mostly for tracking the password type templates.
-const MpwSeries = "2.5.x"
+const MpwSeries = "2.6"
+
 // MpwPasswordTypes is for listing the current supported password types.
-const Master_password_types = "maximum, long, medium, short, basic, pin"
+const Master_password_types = "basic, long, maximum, medium, name, phrase, pin, short"
 
 const master_password_seed = "com.lyndir.masterpassword"
 
 // MasterPW contains all relevant items for MasterPassword to act upon.
 type MasterPW struct {
-	Counter uint32
-	PWtype string
+	Counter  uint32
+	PWtype   string
 	Fullname string
 	Password string
-	Site string
+	Site     string
 }
 
 var password_type_templates = map[string][][]byte{
-	"maximum": {[]byte("anoxxxxxxxxxxxxxxxxx"), []byte("axxxxxxxxxxxxxxxxxno")},
+	"basic": {[]byte("aaanaaan"), []byte("aannaaan"), []byte("aaannaaa")},
 	"long": {[]byte("CvcvnoCvcvCvcv"), []byte("CvcvCvcvnoCvcv"), []byte("CvcvCvcvCvcvno"), []byte("CvccnoCvcvCvcv"), []byte("CvccCvcvnoCvcv"),
 		[]byte("CvccCvcvCvcvno"), []byte("CvcvnoCvccCvcv"), []byte("CvcvCvccnoCvcv"), []byte("CvcvCvccCvcvno"), []byte("CvcvnoCvcvCvcc"),
 		[]byte("CvcvCvcvnoCvcc"), []byte("CvcvCvcvCvccno"), []byte("CvccnoCvccCvcv"), []byte("CvccCvccnoCvcv"), []byte("CvccCvccCvcvno"),
 		[]byte("CvcvnoCvccCvcc"), []byte("CvcvCvccnoCvcc"), []byte("CvcvCvccCvccno"), []byte("CvccnoCvcvCvcc"), []byte("CvccCvcvnoCvcc"),
 		[]byte("CvccCvcvCvccno")},
-	"medium": {[]byte("CvcnoCvc"), []byte("CvcCvcno")},
-	"short":  {[]byte("Cvcn")},
-	"basic":  {[]byte("aaanaaan"), []byte("aannaaan"), []byte("aaannaaa")},
-	"pin":    {[]byte("nnnn")},
+	"maximum": {[]byte("anoxxxxxxxxxxxxxxxxx"), []byte("axxxxxxxxxxxxxxxxxno")},
+	"medium":  {[]byte("CvcnoCvc"), []byte("CvcCvcno")},
+	"name":    {[]byte("cvccvcvcv")},
+	"phrase":  {[]byte("cvcc cvc cvccvcv cvc"), []byte("cvc cvccvcvcv cvcv"), []byte("cv cvccv cvc cvcvccv")},
+	"pin":     {[]byte("nnnn")},
+	"short":   {[]byte("Cvcn")},
 }
 
 var template_characters = map[byte]string{
@@ -78,13 +82,14 @@ var template_characters = map[byte]string{
 	'n': "0123456789",
 	'o': "@&%?,=[]_:-+*$#!'^~;()/.",
 	'x': "AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz0123456789!@#$%^&*()",
+	' ': " ",
 }
 
 // NewMasterPassword returns a new empty MasterPW struct with counter==1 and pwtype=="long"
 func NewMasterPassword() *MasterPW {
 	return &MasterPW{
 		Counter: 1,
-		PWtype: "long",
+		PWtype:  "long",
 	}
 }
 
@@ -92,6 +97,20 @@ func NewMasterPassword() *MasterPW {
 // Valid password_types: maximum, long, medium, short, basic, pin
 func (m *MasterPW) MasterPassword() (string, error) {
 	return MasterPassword(m.Counter, m.PWtype, m.Fullname, m.Password, m.Site)
+}
+
+// GetPWtypes returns a sorted list of valid password types
+func (m *MasterPW) GetPWtypes() []string {
+	keys := make([]string, len(password_type_templates))
+	i := 0
+	for k, _ := range password_type_templates {
+		keys[i] = k
+		i++
+	}
+
+	sort.Strings(keys)
+
+	return keys
 }
 
 func (m *MasterPW) IsValidPWtype(password_type string) bool {

@@ -41,6 +41,8 @@ func TestDerivePassword(t *testing.T) {
 		{1, "basic", "user", "password", "example.com", "pIS54PLs"},
 		{1, "short", "user", "password", "example.com", "Zed5"},
 		{1, "pin", "user", "password", "example.com", "6685"},
+		{1, "name", "user", "password", "example.com", "zedjuzoco"},
+		{1, "phrase", "user", "password", "example.com", "ze juzxo sax taxocre"},
 	}
 
 	expectations_bad := []testVector{
