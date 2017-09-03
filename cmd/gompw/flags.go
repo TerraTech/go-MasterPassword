@@ -25,9 +25,12 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
+	"strconv"
 
 	"github.com/TerraTech/go-MasterPassword/crypto"
+	"github.com/TerraTech/go-MasterPassword/utils"
 	flag "github.com/spf13/pflag"
 )
 
@@ -40,8 +43,9 @@ func handleFlags(m *MPW) {
 		flag.PrintDefaults()
 		fmt.Println()
 		fmt.Println("==Environment Variables==")
-		fmt.Println("  MP_FULLNAME")
-		fmt.Println("  MP_PWTYPE")
+		fmt.Println("  MP_FULLNAME     | The full name of the user (see -u)")
+		fmt.Println("  MP_PWTYPE       | The password type (see -t)")
+		fmt.Println("  MP_SITECOUNTER  | The default counter value (see -c)")
 	}
 
 	default_pwType := m.PWtype // stuff away default PWtype
@@ -53,6 +57,7 @@ func handleFlags(m *MPW) {
 	}
 
 	// "-v" reserved for '--verbose' if implemented
+	flag.Uint32VarP(&m.Counter, "counter", "c", 1, "Site password counter value.")
 	flag.UintVarP(&m.fd, "fd", "d", 0, "Read user's master password from given file descriptor.")
 	flag.StringVarP(&m.pwFile, "file", "f", "", "Read user's master password from given filename.")
 	flag.StringVarP(&m.Fullname, "fullname", "u", os.Getenv("MP_FULLNAME"), "Fullname")
@@ -127,5 +132,23 @@ func handleFlags(m *MPW) {
 	// handle pwType
 	if m.PWtype == "" {
 		m.PWtype = default_pwType
+	}
+
+	// handle site counter
+	if !flag.ShorthandLookup("c").Changed {
+		// Check to see if defined via envariable
+		siteCounter := os.Getenv("MP_SITECOUNTER")
+		if siteCounter != "" {
+			mc, err := strconv.Atoi(siteCounter)
+			if err != nil {
+				log.Print("Invalid value specified for MP_SITECOUNTER")
+				log.Fatal(err.Error())
+			}
+			m.Counter = uint32(mc)
+		}
+
+	}
+	if err := utils.ValidateSiteCounter(m.Counter); err != nil {
+		log.Fatal(err.Error())
 	}
 }

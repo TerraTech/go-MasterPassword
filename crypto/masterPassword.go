@@ -28,6 +28,7 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/TerraTech/go-MasterPassword/utils"
 	"golang.org/x/crypto/scrypt"
 )
 
@@ -42,6 +43,7 @@ const master_password_seed = "com.lyndir.masterpassword"
 
 // MasterPW contains all relevant items for MasterPassword to act upon.
 type MasterPW struct {
+	// Counter >= 1
 	Counter  uint32
 	PWtype   string
 	Fullname string
@@ -115,6 +117,10 @@ func MasterPassword(counter uint32, password_type, user, password, site string) 
 	templates := password_type_templates[password_type]
 	if templates == nil {
 		return "", fmt.Errorf("cannot find password template %s", password_type)
+	}
+
+	if err := utils.ValidateSiteCounter(counter); err != nil {
+		return "", err
 	}
 
 	var buffer bytes.Buffer
