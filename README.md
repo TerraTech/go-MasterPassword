@@ -1,3 +1,4 @@
+[![GoDoc](https://godoc.org/github.com/TerraTech/go-MasterPassword?status.svg)](https://godoc.org/github.com/TerraTech/go-MasterPassword)
 # Go implementation of the Master Password client and library
 
 ## [Master Password •••|](http://masterpasswordapp.com)
