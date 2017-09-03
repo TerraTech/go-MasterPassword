@@ -54,7 +54,7 @@ func handleFlags(m *MPW) {
 
 	// "-v" reserved for '--verbose' if implemented
 	flag.UintVarP(&m.fd, "fd", "d", 0, "Read user's master password from given file descriptor.")
-	flag.StringVarP(&m.pwFile, "file", "f", "", "Read user's master password from given file.")
+	flag.StringVarP(&m.pwFile, "file", "f", "", "Read user's master password from given filename.")
 	flag.StringVarP(&m.Fullname, "fullname", "u", os.Getenv("MP_FULLNAME"), "Fullname")
 	flag.StringVarP(&m.PWtype, "pwtype", "t", os.Getenv("MP_PWTYPE"), flagthelp("Password Type"))
 	flag.BoolVarP(&flagListPWtypes, "listPWtypes", "l", false, "List valid Password Types")
