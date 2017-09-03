@@ -107,12 +107,12 @@ We standardize `user-name` as your full name, `site-name` as the domain name of 
 Couple different methods to install: **gompw**
 1. *go get*
 ```shell
-go get -u https://github.com/TerraTech/go-MasterPassword/cmd/gompw
+go get -u github.com/TerraTech/go-MasterPassword/cmd/gompw
 ```
 
 2. Manual
 ```shell
-go get -u -d https://github.com/TerraTech/go-MasterPassword/cmd/gompw
+go get -u -d github.com/TerraTech/go-MasterPassword/cmd/gompw
 cd ${GOPATH}/src/github.com/TerraTech/go-MasterPassword
 make (or make install)
 ```
