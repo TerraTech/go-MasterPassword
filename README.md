@@ -110,9 +110,9 @@ Couple different methods to install: **gompw**
 go get -u https://github.com/TerraTech/go-MasterPassword/cmd/gompw
 ```
 
-2. Manually
+2. Manual
 ```shell
-go get -u -d https://github.com/TerraTech/go-MasterPassword
+go get -u -d https://github.com/TerraTech/go-MasterPassword/cmd/gompw
 cd ${GOPATH}/src/github.com/TerraTech/go-MasterPassword
 make (or make install)
 ```
