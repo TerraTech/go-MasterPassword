@@ -28,7 +28,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/TerraTech/go-MasterPassword/utils"
+	"github.com/TerraTech/go-MasterPassword/common"
 	"golang.org/x/crypto/scrypt"
 )
 
@@ -119,7 +119,7 @@ func MasterPassword(counter uint32, password_type, user, password, site string) 
 		return "", fmt.Errorf("cannot find password template %s", password_type)
 	}
 
-	if err := utils.ValidateSiteCounter(counter); err != nil {
+	if err := common.ValidateSiteCounter(counter); err != nil {
 		return "", err
 	}
 

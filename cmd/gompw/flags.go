@@ -30,7 +30,7 @@ import (
 	"strconv"
 
 	"github.com/TerraTech/go-MasterPassword/crypto"
-	"github.com/TerraTech/go-MasterPassword/utils"
+	"github.com/TerraTech/go-MasterPassword/common"
 	flag "github.com/spf13/pflag"
 )
 
@@ -148,7 +148,7 @@ func handleFlags(m *MPW) {
 		}
 
 	}
-	if err := utils.ValidateSiteCounter(m.Counter); err != nil {
+	if err := common.ValidateSiteCounter(m.Counter); err != nil {
 		log.Fatal(err.Error())
 	}
 }
