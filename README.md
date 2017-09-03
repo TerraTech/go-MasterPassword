@@ -1,4 +1,3 @@
-[TOC]
 # Go implementation of the Master Password client and library
 
 ## [Master Password •••|](http://masterpasswordapp.com)
@@ -117,3 +116,5 @@ go get -u -d https://github.com/TerraTech/go-MasterPassword
 cd ${GOPATH}/src/github.com/TerraTech/go-MasterPassword
 make (or make install)
 ```
+`make` will build and install: `bin/gompw`  
+`make install` will install `gompw` into your $GOBIN location
