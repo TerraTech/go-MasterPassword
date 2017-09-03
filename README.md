@@ -95,7 +95,7 @@ We standardize `user-name` as your full name, `site-name` as the domain name of 
 
 * No.  They are used for different reasons and one is not weaker than the other.
 
-  HMAC-SHA-256 is much faster to compute than [SCRYPT](https://en.wikipedia.org/wiki/Scrypt), which leads some people to think "all an attacker needs to do is brute-force the SHA and ignore the SCRYPT".  The reality is that the HMAC-SHA-256 guards a 64-byte authentication key (the `master-key`) which makes the search space for brute-forcing the HMAC wildly too large to compute.
+  HMAC-SHA-256 is much faster to compute than SCRYPT, which leads some people to think "all an attacker needs to do is brute-force the SHA and ignore the SCRYPT".  The reality is that the HMAC-SHA-256 guards a 64-byte authentication key (the `master-key`) which makes the search space for brute-forcing the HMAC wildly too large to compute.
 
   The `master-password` on the other hand, is only a simple phrase, which means its search space is much smaller.  This is why it is guarded by a much tougher SCRYPT operation.
 
