@@ -29,8 +29,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/TerraTech/go-MasterPassword/crypto"
-	"github.com/TerraTech/go-MasterPassword/common"
+	"github.com/TerraTech/go-MasterPassword/pkg/common"
+	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
 	flag "github.com/spf13/pflag"
 )
 

@@ -23,7 +23,7 @@ package crypto_test
 import (
 	"testing"
 
-	"github.com/TerraTech/go-MasterPassword/crypto"
+	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
 	"github.com/stretchr/testify/assert"
 )
 

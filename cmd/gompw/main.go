@@ -26,7 +26,7 @@ import (
 	"path"
 
 	"github.com/TerraTech/FQgolibs/FQversion"
-	"github.com/TerraTech/go-MasterPassword/crypto"
+	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
 )
 
 var (
