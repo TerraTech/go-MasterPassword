@@ -18,21 +18,20 @@
 // LICENSE file.  Alternatively, see <http://www.gnu.org/licenses/>.
 //==============================================================================
 
-package common
+package common_test
 
 import (
-	"errors"
+	"testing"
+
+	"github.com/TerraTech/go-MasterPassword/pkg/common"
+	"github.com/stretchr/testify/assert"
 )
 
-var (
-	ErrCounter = errors.New("site password counter must be >= 1")
-)
+func TestValidateSiteCounter(t *testing.T) {
+	// good
+	assert.NoError(t, common.ValidateSiteCounter(1))
+	assert.NoError(t, common.ValidateSiteCounter(9999))
 
-// ValidateSiteCounter validates that it's value is >= 1
-func ValidateSiteCounter(counter uint32) error {
-	if counter < 1 {
-		return ErrCounter
-	}
-
-	return nil
+	// bad
+	assert.Error(t, common.ErrCounter, common.ValidateSiteCounter(0))
 }
