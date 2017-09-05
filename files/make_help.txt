@@ -9,3 +9,6 @@
   vet       : vets the project files
   testall   : runs targets: fmt + vet + test
 
+  vendor    : (internal) updates local FQgolibs vendoring
+  vendorDry : (internal) dry runs the 'vendor' target
+  glide     : (internal) runs 'glide up' + 'vendor' target
