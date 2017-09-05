@@ -1,0 +1,11 @@
+==Make Help==
+
+  build     : (default) builds the gompw CLI binary and places in ./bin
+  install   : builds and installs the gompw CLI binary and places in $GOPATH/bin
+  clean     : deletes any installed CLI binary in ./bin & $GOPATH/bin
+
+  fmt       : go fmt the project files
+  test      : runs all tests
+  vet       : vets the project files
+  testall   : runs targets: fmt + vet + test
+

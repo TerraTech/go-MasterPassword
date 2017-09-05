@@ -21,6 +21,10 @@ build: bin/$(CLI)
 bin/$(CLI): $(GOFILES)
 	@GOBIN=$(PWD)/bin go install -v -ldflags $(LD_FLAGS) $(CMD_PATH)/$(CLI)
 
+.PHONY: help
+help:
+	@cat files/make_help.txt
+
 .PHONY: install
 install: build
 	@scripts/install.sh
