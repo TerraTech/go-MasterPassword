@@ -35,7 +35,10 @@ import (
 )
 
 func handleFlags(m *MPW) {
+	var config Config
+	var configFile string
 	var err error
+	var ignoreConfigFile bool
 	var pwInput io.Reader
 
 	flag.Usage = func() {
@@ -43,6 +46,7 @@ func handleFlags(m *MPW) {
 		flag.PrintDefaults()
 		fmt.Println()
 		fmt.Println("==Environment Variables==")
+		fmt.Println("  MP_CONFIGFILE   | The user configuration file (see -C)")
 		fmt.Println("  MP_FULLNAME     | The full name of the user (see -u)")
 		fmt.Println("  MP_PWTYPE       | The password type (see -t)")
 		fmt.Println("  MP_SITECOUNTER  | The default counter value (see -c)")
@@ -57,13 +61,15 @@ func handleFlags(m *MPW) {
 	}
 
 	// "-v" reserved for '--verbose' if implemented
-	flag.Uint32VarP(&m.Counter, "counter", "c", 1, "Site password counter value.")
-	flag.UintVarP(&m.fd, "fd", "d", 0, "Read user's master password from given file descriptor.")
-	flag.StringVarP(&m.pwFile, "file", "f", "", "Read user's master password from given filename.")
-	flag.StringVarP(&m.Fullname, "fullname", "u", os.Getenv("MP_FULLNAME"), "Fullname")
-	flag.StringVarP(&m.PWtype, "pwtype", "t", os.Getenv("MP_PWTYPE"), flagthelp("Password Type"))
 	flag.BoolVarP(&flagListPWtypes, "listPWtypes", "l", false, "List valid Password Types")
 	flag.BoolVarP(&flagShowVersion, "version", "V", false, "Show version")
+	flag.BoolVarP(&ignoreConfigFile, "ignoreUserConfig", "I", false, "Ignore user configuration file")
+	flag.StringVarP(&configFile, "config", "C", "", "User configuration file override")
+	flag.StringVarP(&m.Fullname, "fullname", "u", os.Getenv("MP_FULLNAME"), "Fullname")
+	flag.StringVarP(&m.pwFile, "file", "f", "", "Read user's master password from given filename.")
+	flag.StringVarP(&m.PWtype, "pwtype", "t", os.Getenv("MP_PWTYPE"), flagthelp("Password Type"))
+	flag.Uint32VarP(&m.Counter, "counter", "c", 1, "Site password counter value.")
+	flag.UintVarP(&m.fd, "fd", "d", 0, "Read user's master password from given file descriptor.")
 
 	flag.Parse()
 
