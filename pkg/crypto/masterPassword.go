@@ -36,19 +36,18 @@ import (
 //   This is mostly for tracking the password type templates.
 const MpwSeries = "2.6"
 
-// MpwPasswordTypes is for listing the current supported password types.
-const Master_password_types = "basic, long, maximum, medium, name, phrase, pin, short"
+// MasterPasswordTypes is for listing the current supported password types.
+const MasterPasswordTypes = "basic, long, maximum, medium, name, phrase, pin, short"
 
-const master_password_seed = "com.lyndir.masterpassword"
+const MasterPasswordSeed = "com.lyndir.masterpassword"
 
 // MasterPW contains all relevant items for MasterPassword to act upon.
 type MasterPW struct {
-	// Counter >= 1
-	Counter  uint32 `toml:"counter,omitempty"`
-	PWtype   string `toml:"passwordType,omitempty"`
-	Fullname string `toml:"fullname,omitempty"`
-	Password string `toml:"password,omitempty"`
-	Site     string `toml:"site,omitempty"`
+	PasswordType       string `toml:"passwordType,omitempty"`
+	Fullname           string `toml:"fullname,omitempty"`
+	Password           string `toml:"password,omitempty"`
+	Site               string `toml:"site,omitempty"`
+	Counter            uint32 `toml:"counter,omitempty"` // Counter >= 1
 }
 
 var password_type_templates = map[string][][]byte{
@@ -82,19 +81,19 @@ var template_characters = map[byte]string{
 // NewMasterPassword returns a new empty MasterPW struct with counter==1 and pwtype=="long"
 func NewMasterPassword() *MasterPW {
 	return &MasterPW{
-		Counter: 1,
-		PWtype:  "long",
+		Counter:      1,
+		PasswordType: "long",
 	}
 }
 
 // MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
 // Valid password_types: maximum, long, medium, short, basic, pin
 func (m *MasterPW) MasterPassword() (string, error) {
-	return MasterPassword(m.Counter, m.PWtype, m.Fullname, m.Password, m.Site)
+	return MasterPassword(m.Counter, m.PasswordType, m.Fullname, m.Password, m.Site)
 }
 
-// GetPWtypes returns a sorted list of valid password types
-func (m *MasterPW) GetPWtypes() []string {
+// GetPasswordTypes returns a sorted list of valid password types
+func (m *MasterPW) GetPasswordTypes() []string {
 	keys := make([]string, len(password_type_templates))
 	i := 0
 	for k, _ := range password_type_templates {
@@ -107,7 +106,7 @@ func (m *MasterPW) GetPWtypes() []string {
 	return keys
 }
 
-func (m *MasterPW) IsValidPWtype(password_type string) bool {
+func (m *MasterPW) IsValidPasswordType(password_type string) bool {
 	_, exists := password_type_templates[password_type]
 	return exists
 }
@@ -124,7 +123,7 @@ func MasterPassword(counter uint32, password_type, user, password, site string) 
 	}
 
 	var buffer bytes.Buffer
-	buffer.WriteString(master_password_seed)
+	buffer.WriteString(MasterPasswordSeed)
 	binary.Write(&buffer, binary.BigEndian, uint32(len(user)))
 	buffer.WriteString(user)
 
@@ -134,7 +133,7 @@ func MasterPassword(counter uint32, password_type, user, password, site string) 
 		return "", fmt.Errorf("failed to derive password: %s", err)
 	}
 
-	buffer.Truncate(len(master_password_seed))
+	buffer.Truncate(len(MasterPasswordSeed))
 	binary.Write(&buffer, binary.BigEndian, uint32(len(site)))
 	buffer.WriteString(site)
 	binary.Write(&buffer, binary.BigEndian, counter)

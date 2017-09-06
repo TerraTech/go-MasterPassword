@@ -34,7 +34,7 @@ func fatal(msg string) {
 
 func listPWtypes(m *MPW) {
 	fmt.Println("=Valid Password Types=")
-	fmt.Println(strings.Join(m.GetPWtypes(), "\n"))
+	fmt.Println(strings.Join(m.GetPasswordTypes(), "\n"))
 }
 
 func showVersion() {

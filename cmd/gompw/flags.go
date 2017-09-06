@@ -52,12 +52,12 @@ func handleFlags(m *MPW) {
 		fmt.Println("  MP_SITECOUNTER  | The default counter value (see -c)")
 	}
 
-	default_pwType := m.PWtype // stuff away default PWtype
+	default_pwType := m.PasswordType // stuff away default PasswordType
 	var flagShowVersion bool
 	var flagListPWtypes bool
 
 	flagthelp := func(msg string) string {
-		return fmt.Sprintf("%s [%s]", msg, crypto.Master_password_types)
+		return fmt.Sprintf("%s [%s]", msg, crypto.MasterPasswordTypes)
 	}
 
 	// "-v" reserved for '--verbose' if implemented
@@ -146,8 +146,8 @@ func handleFlags(m *MPW) {
 	}
 
 	// handle pwType
-	if m.PWtype == "" {
-		m.PWtype = default_pwType
+	if m.PasswordType == "" {
+		m.PasswordType = default_pwType
 	}
 
 	// handle site counter
