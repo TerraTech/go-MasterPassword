@@ -27,36 +27,70 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDerivePassword(t *testing.T) {
-	type testVector struct {
-		c            uint32
-		pt, u, pw, s string
-		expect       string
+var mpwseeds = []string{
+	crypto.MasterPasswordSeed,
+	"overrideDefaultMPWseed",
+	"liveLifeBeyondAllYourTomorrrows",
+	"danceLikeNoOneIsLooking",
+}
+
+type mpw struct {
+	*crypto.MasterPW
+}
+
+type testVector struct {
+	ms           string
+	c            uint32
+	pt, u, pw, s string
+	expect       string
+}
+
+func newMpw(tv testVector) *mpw {
+	return &mpw{
+		&crypto.MasterPW{
+			MasterPasswordSeed: tv.ms,
+			Counter:            tv.c,
+			PasswordType:       tv.pt,
+			Fullname:           tv.u,
+			Password:           tv.pw,
+			Site:               tv.s,
+		},
 	}
+}
+
+func TestMasterPassword(t *testing.T) {
 	expectations := []testVector{
-		{1, "long", "user", "password", "example.com", "ZedaFaxcZaso9*"},
-		{2, "long", "user", "password", "example.com", "Fovi2@JifpTupx"},
-		{1, "maximum", "user", "password", "example.com", "pf4zS1LjCg&LjhsZ7T2~"},
-		{1, "medium", "user", "password", "example.com", "ZedJuz8$"},
-		{1, "basic", "user", "password", "example.com", "pIS54PLs"},
-		{1, "short", "user", "password", "example.com", "Zed5"},
-		{1, "pin", "user", "password", "example.com", "6685"},
-		{1, "name", "user", "password", "example.com", "zedjuzoco"},
-		{1, "phrase", "user", "password", "example.com", "ze juzxo sax taxocre"},
+		{mpwseeds[0], 1, "long", "user", "password", "example.com", "ZedaFaxcZaso9*"},
+		{mpwseeds[0], 2, "long", "user", "password", "example.com", "Fovi2@JifpTupx"},
+		{mpwseeds[0], 1, "maximum", "user", "password", "example.com", "pf4zS1LjCg&LjhsZ7T2~"},
+		{mpwseeds[0], 1, "medium", "user", "password", "example.com", "ZedJuz8$"},
+		{mpwseeds[0], 1, "basic", "user", "password", "example.com", "pIS54PLs"},
+		{mpwseeds[0], 1, "short", "user", "password", "example.com", "Zed5"},
+		{mpwseeds[0], 1, "pin", "user", "password", "example.com", "6685"},
+		{mpwseeds[0], 1, "name", "user", "password", "example.com", "zedjuzoco"},
+		{mpwseeds[0], 1, "phrase", "user", "password", "example.com", "ze juzxo sax taxocre"},
 	}
 
 	expectations_bad := []testVector{
-		{1, "invalidType", "user", "password", "example.com", "1111"},
+		{mpwseeds[0], 1, "invalidType", "user", "password", "example.com", "1111"},
 	}
 
-	for _, m := range expectations {
-		pw, err := crypto.MasterPassword(m.c, m.pt, m.u, m.pw, m.s)
+	for _, tv := range expectations {
+		pw, err := crypto.MasterPassword(tv.ms, tv.pt, tv.u, tv.pw, tv.s, tv.c)
 		assert.NoError(t, err)
-		assert.Equal(t, m.expect, pw)
+		assert.Equal(t, tv.expect, pw)
 	}
 
-	for _, m := range expectations_bad {
-		_, err := crypto.MasterPassword(m.c, m.pt, m.u, m.pw, m.s)
+	for _, tv := range expectations_bad {
+		_, err := crypto.MasterPassword(tv.ms, tv.pt, tv.u, tv.pw, tv.s, tv.c)
 		assert.Error(t, err)
+	}
+
+	// Test method call
+	for _, tv := range expectations {
+		mpw := newMpw(tv)
+		pw, err := mpw.MasterPassword()
+		assert.NoError(t, err)
+		assert.Equal(t, tv.expect, pw)
 	}
 }
