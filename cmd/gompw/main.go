@@ -25,7 +25,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/TerraTech/FQgolibs/FQversion"
+	"futurequest.net/FQgolibs/FQversion"
 	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
 )
 

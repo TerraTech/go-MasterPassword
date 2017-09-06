@@ -25,7 +25,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/TerraTech/FQgolibs/FQversion"
+	"futurequest.net/FQgolibs/FQversion"
 )
 
 func fatal(msg string) {
