@@ -25,11 +25,28 @@ import (
 	"log"
 	"strings"
 
+	"futurequest.net/FQgolibs/FQdebug"
 	"futurequest.net/FQgolibs/FQversion"
+	"github.com/mattn/go-isatty"
 )
+
+var (
+	D = FQdebug.D
+	MP_DEBUG bool
+)
+
+func DEBUG(msg string) {
+	if MP_DEBUG {
+		log.Printf("[DEBUG] %s", msg)
+	}
+}
 
 func fatal(msg string) {
 	log.Fatalf("[Fatal] %s", msg)
+}
+
+func isaTTY(fd uintptr) bool {
+	return isatty.IsTerminal(fd) || isatty.IsCygwinTerminal(fd)
 }
 
 func listPasswordTypes(m *MPW) {
