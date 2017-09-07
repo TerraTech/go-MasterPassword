@@ -1,8 +1,10 @@
-hash: 58948cc2ac1fd3d2560da60b27e81fdee2af7cb066acfe04545be9bdbbcdd69d
-updated: 2017-09-05T14:29:53.391737162-04:00
+hash: f1e973b47a3652b86dc8cb8c84ae6497c73177ede7c1763e1826ed1eaeb0db19
+updated: 2017-09-07T07:55:13.08983678-04:00
 imports:
 - name: github.com/goruha/permbits
   version: b7b74f7b45ae871ecc96e07e9abe5225b366c66b
+- name: github.com/mattn/go-isatty
+  version: fc9e8d8ef48496124e79ae0df75490096eccf6fe
 - name: github.com/pelletier/go-toml
   version: 1d6b12b7cb290426e27e6b4e38b89fcda3aeef03
 - name: github.com/spf13/pflag

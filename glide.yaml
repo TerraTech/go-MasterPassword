@@ -10,6 +10,8 @@ import:
 - package: github.com/goruha/permbits
 - package: github.com/pelletier/go-toml
   version: 1d6b12b
+- package: github.com/mattn/go-isatty
+  version: ^0.0.2
 testImport:
 - package: github.com/stretchr/testify
   version: ^1.1.4
