@@ -1,5 +1,5 @@
-hash: 58948cc2ac1fd3d2560da60b27e81fdee2af7cb066acfe04545be9bdbbcdd69d
-updated: 2017-09-05T14:29:53.391737162-04:00
+hash: 646419524e72816e83e9067d96998307fe1fd02160d80c48f3eb4325be49d3c1
+updated: 2017-09-07T08:59:34.500494068-04:00
 imports:
 - name: github.com/goruha/permbits
   version: b7b74f7b45ae871ecc96e07e9abe5225b366c66b
@@ -12,6 +12,12 @@ imports:
   subpackages:
   - pbkdf2
   - scrypt
+  - ssh/terminal
+- name: golang.org/x/sys
+  version: 9aade4d3a3b7e6d876cd3823ad20ec45fc035402
+  subpackages:
+  - unix
+  - windows
 testImports:
 - name: github.com/davecgh/go-spew
   version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
