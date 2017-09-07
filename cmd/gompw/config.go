@@ -35,6 +35,12 @@ const DefaultConfigFilename = "gompw.toml"
 
 type Config crypto.MasterPW
 
+func NewConfig() Config {
+	var c Config
+
+	return c
+}
+
 // generate configfile names
 // Precedence:
 //   1) ./gompw.toml
