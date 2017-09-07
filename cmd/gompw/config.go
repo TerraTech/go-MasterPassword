@@ -125,3 +125,19 @@ func (c *Config) LoadConfig(configFile string) error {
 
 	return nil
 }
+
+// Merge will transfer data from Config to MasterPW for any nil values
+func (c *Config) Merge(m *MPW) {
+	// Counter and PWType are already set by default
+	if m.Fullname == "" {
+		m.Fullname = c.Fullname
+	}
+
+	if m.Password == "" {
+		m.Password = c.Password
+	}
+
+	if m.Site == "" {
+		m.Site = c.Site
+	}
+}
