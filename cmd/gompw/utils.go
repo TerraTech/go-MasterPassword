@@ -27,11 +27,11 @@ import (
 
 	"futurequest.net/FQgolibs/FQdebug"
 	"futurequest.net/FQgolibs/FQversion"
-	"github.com/mattn/go-isatty"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 var (
-	D = FQdebug.D
+	D        = FQdebug.D
 	MP_DEBUG bool
 )
 
@@ -46,12 +46,16 @@ func fatal(msg string) {
 }
 
 func isaTTY(fd uintptr) bool {
-	return isatty.IsTerminal(fd) || isatty.IsCygwinTerminal(fd)
+	return terminal.IsTerminal(int(fd))
 }
 
 func listPasswordTypes(m *MPW) {
 	fmt.Println("=Valid Password Types=")
 	fmt.Println(strings.Join(m.GetPasswordTypes(), "\n"))
+}
+
+func readPassword(fd uintptr) ([]byte, error) {
+	return terminal.ReadPassword(int(fd))
 }
 
 func showVersion() {

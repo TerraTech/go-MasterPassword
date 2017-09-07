@@ -21,7 +21,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"io"
@@ -124,37 +123,38 @@ func handleFlags(m *MPW) {
 	// 1) -f
 	// 2) -d
 	// 3) stdin
-	if flag.ShorthandLookup("f").Changed {
-		DEBUG("pwInput: file")
-		pwInput, err = os.Open(m.pwFile)
+	if flag.ShorthandLookup("f").Changed || flag.ShorthandLookup("d").Changed {
+		if flag.ShorthandLookup("f").Changed {
+			DEBUG("pwInput: file")
+			pwInput, err = os.Open(m.pwFile)
+		} else if flag.ShorthandLookup("d").Changed {
+			DEBUG("pwInput: fd")
+			pwInput = os.NewFile(uintptr(m.fd), "")
+		}
 		if err != nil {
 			fatal(err.Error())
 		}
-	} else if flag.ShorthandLookup("d").Changed {
-		DEBUG("pwInput: fd")
-		pwInput = os.NewFile(uintptr(m.fd), "")
+
+		if pwInput == nil {
+			fatal("Cannot create io.Reader for password input")
+		}
+
+		pwBytes, err = ioutil.ReadAll(pwInput)
+		if err != nil {
+			fatal(err.Error())
+		}
 	} else {
 		DEBUG("pwInput: stdin")
-		if isaTTY(os.Stdin.Fd()) {
-			pwInput = os.Stdin
+		fd := os.Stdin.Fd()
+		if isaTTY(fd) {
+			if isaTTY(os.Stderr.Fd()) {
+				fmt.Fprintf(os.Stderr, "Your master password: ")
+				pwBytes, err = readPassword(fd)
+				fmt.Fprintln(os.Stderr)
+			} else {
+				pwBytes, err = readPassword(fd)
+			}
 		}
-	}
-
-	if pwInput == nil {
-		fatal("Cannot create io.Reader for password input")
-	}
-
-
-	if pwInput == os.Stdin {
-		reader := bufio.NewReader(pwInput)
-
-		fmt.Print("Your master password: ")
-		pwBytes, err = reader.ReadBytes('\n')
-	} else {
-		pwBytes, err = ioutil.ReadAll(pwInput)
-	}
-	if err != nil {
-		fatal(err.Error())
 	}
 
 	m.Password = string(bytes.TrimSpace(pwBytes))
