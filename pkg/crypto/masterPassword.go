@@ -37,7 +37,7 @@ import (
 const MpwSeries = "2.6"
 
 // MasterPasswordTypes is for listing the current supported password types.
-const MasterPasswordTypes = "basic, long, maximum, medium, name, phrase, pin, short"
+const MasterPasswordTypes = "basic, *long*, maximum, medium, name, phrase, pin, short"
 
 const MasterPasswordSeed = "com.lyndir.masterpassword"
 
