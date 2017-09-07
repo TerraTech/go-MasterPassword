@@ -21,6 +21,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"io"
@@ -39,6 +40,7 @@ func handleFlags(m *MPW) {
 	var configFile string
 	var err error
 	var ignoreConfigFile bool
+	var pwBytes []byte
 	var pwInput io.Reader
 
 	flag.Usage = func() {
@@ -47,6 +49,7 @@ func handleFlags(m *MPW) {
 		fmt.Println()
 		fmt.Println("==Environment Variables==")
 		fmt.Println("  MP_CONFIGFILE   | The user configuration file (see -C)")
+		//             MP_DEBUG
 		fmt.Println("  MP_FULLNAME     | The full name of the user (see -u)")
 		fmt.Println("  MP_PWTYPE       | The password type (see -t)")
 		fmt.Println("  MP_SITECOUNTER  | The default counter value (see -c)")
@@ -72,6 +75,10 @@ func handleFlags(m *MPW) {
 	flag.UintVarP(&m.fd, "fd", "d", 0, "Read user's master password from given file descriptor.")
 
 	flag.Parse()
+
+	if os.Getenv("MP_DEBUG") != "" {
+		MP_DEBUG = true
+	}
 
 	if flagShowVersion {
 		showVersion()
@@ -118,15 +125,17 @@ func handleFlags(m *MPW) {
 	// 2) -d
 	// 3) stdin
 	if flag.ShorthandLookup("f").Changed {
+		DEBUG("pwInput: file")
 		pwInput, err = os.Open(m.pwFile)
 		if err != nil {
 			fatal(err.Error())
 		}
 	} else if flag.ShorthandLookup("d").Changed {
+		DEBUG("pwInput: fd")
 		pwInput = os.NewFile(uintptr(m.fd), "")
 	} else {
-		stat, _ := os.Stdin.Stat()
-		if (stat.Mode() & os.ModeCharDevice) == 0 {
+		DEBUG("pwInput: stdin")
+		if isaTTY(os.Stdin.Fd()) {
 			pwInput = os.Stdin
 		}
 	}
@@ -135,10 +144,19 @@ func handleFlags(m *MPW) {
 		fatal("Cannot create io.Reader for password input")
 	}
 
-	pwBytes, err := ioutil.ReadAll(pwInput)
+
+	if pwInput == os.Stdin {
+		reader := bufio.NewReader(pwInput)
+
+		fmt.Print("Your master password: ")
+		pwBytes, err = reader.ReadBytes('\n')
+	} else {
+		pwBytes, err = ioutil.ReadAll(pwInput)
+	}
 	if err != nil {
 		fatal(err.Error())
 	}
+
 	m.Password = string(bytes.TrimSpace(pwBytes))
 
 	if m.Password == "" {
