@@ -78,6 +78,9 @@ func Gcfn(f, home string, abort <-chan struct{}) <-chan string {
 }
 
 func (c *Config) LoadConfig(configFile string) error {
+	var t []byte
+	var err error
+
 	if configFile != "" {
 		// validate given configFile
 		if !FQfile.IsFile(configFile) {
@@ -96,9 +99,11 @@ func (c *Config) LoadConfig(configFile string) error {
 		}
 	}
 
-	t, err := ioutil.ReadFile(configFile)
-	if err != nil {
-		return err
+	if configFile != "" {
+		t, err = ioutil.ReadFile(configFile)
+		if err != nil {
+			return err
+		}
 	}
 
 	if len(t) == 0 {
