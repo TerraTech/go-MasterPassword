@@ -44,9 +44,6 @@ func Gcfn(f, home string, abort <-chan struct{}) <-chan string {
 	ch := make(chan string)
 	// get file name
 	gfn := func(d, dot string) string {
-		if d == "" {
-			//d = "."
-		}
 		return filepath.Join(d, dot+f)
 	}
 
