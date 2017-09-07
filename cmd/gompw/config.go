@@ -31,7 +31,11 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
-const DefaultConfigFilename = "gompw.toml"
+const (
+	DefaultConfigFilename = "gompw.toml"
+	DefaultCounter        = 1
+	DefaultPWtype         = "long"
+)
 
 type Config crypto.MasterPW
 
@@ -98,13 +102,26 @@ func (c *Config) LoadConfig(configFile string) error {
 	}
 
 	if len(t) == 0 {
-		fmt.Println("!!! zero sized")
-		// just return empty on a zero-sized file
+		// just return empty on a zero-sized file with defaults set
+		c.Counter = DefaultCounter
+		c.PWtype = DefaultPWtype
 		return nil
 	}
 
 	// Needs pelletier/go-toml >= 4a000a21a414d139727f616a8bb97f847b1b310b
 	err = toml.Unmarshal(t, c)
+	if err != nil {
+		return err
+	}
 
-	return err
+	// Set the necessary defaults, since the fields will be nil on 'omitempty'
+	if c.Counter == 0 {
+		c.Counter = DefaultCounter
+	}
+
+	if c.PWtype == "" {
+		c.PWtype = DefaultPWtype
+	}
+
+	return nil
 }
