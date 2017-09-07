@@ -1,0 +1,27 @@
+hash: 58948cc2ac1fd3d2560da60b27e81fdee2af7cb066acfe04545be9bdbbcdd69d
+updated: 2017-09-05T14:29:53.391737162-04:00
+imports:
+- name: github.com/goruha/permbits
+  version: b7b74f7b45ae871ecc96e07e9abe5225b366c66b
+- name: github.com/pelletier/go-toml
+  version: 1d6b12b7cb290426e27e6b4e38b89fcda3aeef03
+- name: github.com/spf13/pflag
+  version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
+- name: golang.org/x/crypto
+  version: 81e90905daefcd6fd217b62423c0908922eadb30
+  subpackages:
+  - pbkdf2
+  - scrypt
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
+- name: github.com/stretchr/testify
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
+  subpackages:
+  - assert

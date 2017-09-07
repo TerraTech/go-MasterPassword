@@ -5,6 +5,10 @@ REPO_PATH=$(ORG_PATH)/$(PROJ)
 CMD_PATH=$(REPO_PATH)/cmd
 export PATH := $(PWD)/bin:$(PATH)
 
+FQGOLIBS_PATH=$(GOPATH)/src/futurequest.net/FQgolibs-Public/
+VENDOR_DST=futurequest.net/FQgolibs
+VENDOR_SUBPKGS_FQ=FQdebug FQfile FQtesting FQversion
+
 GOFILES := $(filter-out ./vendor/% ./@_VERSION_@.go,$(shell find ./ -type f -name '*.go' -print))
 
 BUILDHOST ?= $(shell hostname -s)
@@ -31,8 +35,20 @@ install: build
 
 .PHONY: test
 test:
-	@go test -v -i $(shell go list ./... | grep -v '/vendor/')
 	@go test -v $(shell go list ./... | grep -v '/vendor/')
+
+.PHONY: vendor
+vendor:
+	@scripts/update_vendor.sh $(FQGOLIBS_PATH) $(VENDOR_DST) $(VENDOR_SUBPKGS_FQ)
+
+.PHONY: vendorDry
+vendorDry:
+	@scripts/update_vendor-dryrun.sh $(FQGOLIBS_PATH) $(VENDOR_DST) $(VENDOR_SUBPKGS_FQ)
+
+.PHONY: glide
+glide:
+	@scripts/update_glide.sh
+	@make vendor
 
 .PHONY: vet
 vet:
