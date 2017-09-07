@@ -93,6 +93,16 @@ func handleFlags(m *MPW) {
 		fatal("-d and -f are mutually exclusive.")
 	}
 
+	if !ignoreConfigFile {
+		err := config.LoadConfig(configFile)
+		if err != nil {
+			fatal(err.Error())
+		}
+
+		// prime MasterPW struct with user configFile settings
+		config.Merge(m)
+	}
+
 	if m.Fullname == "" {
 		fatal("Fullname must be specified")
 	}
