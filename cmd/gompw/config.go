@@ -34,7 +34,7 @@ import (
 const (
 	DefaultConfigFilename = "gompw.toml"
 	DefaultCounter        = 1
-	DefaultPWtype         = "long"
+	DefaultPasswordType   = "long"
 )
 
 type Config crypto.MasterPW
@@ -109,7 +109,7 @@ func (c *Config) LoadConfig(configFile string) error {
 	if len(t) == 0 {
 		// just return empty on a zero-sized file with defaults set
 		c.Counter = DefaultCounter
-		c.PWtype = DefaultPWtype
+		c.PasswordType = DefaultPasswordType
 		return nil
 	}
 
@@ -124,8 +124,8 @@ func (c *Config) LoadConfig(configFile string) error {
 		c.Counter = DefaultCounter
 	}
 
-	if c.PWtype == "" {
-		c.PWtype = DefaultPWtype
+	if c.PasswordType == "" {
+		c.PasswordType = DefaultPasswordType
 	}
 
 	return nil

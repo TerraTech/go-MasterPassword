@@ -54,20 +54,20 @@ func handleFlags(m *MPW) {
 
 	default_pwType := m.PasswordType // stuff away default PasswordType
 	var flagShowVersion bool
-	var flagListPWtypes bool
+	var flagListPasswordTypes bool
 
 	flagthelp := func(msg string) string {
 		return fmt.Sprintf("%s [%s]", msg, crypto.MasterPasswordTypes)
 	}
 
 	// "-v" reserved for '--verbose' if implemented
-	flag.BoolVarP(&flagListPWtypes, "listPWtypes", "l", false, "List valid Password Types")
+	flag.BoolVarP(&flagListPasswordTypes, "listPasswordTypes", "l", false, "List valid Password Types")
 	flag.BoolVarP(&flagShowVersion, "version", "V", false, "Show version")
 	flag.BoolVarP(&ignoreConfigFile, "ignoreUserConfig", "I", false, "Ignore user configuration file")
 	flag.StringVarP(&configFile, "config", "C", "", "User configuration file override")
 	flag.StringVarP(&m.Fullname, "fullname", "u", os.Getenv("MP_FULLNAME"), "Fullname")
 	flag.StringVarP(&m.pwFile, "file", "f", "", "Read user's master password from given filename.")
-	flag.StringVarP(&m.PWtype, "pwtype", "t", os.Getenv("MP_PWTYPE"), flagthelp("Password Type"))
+	flag.StringVarP(&m.PasswordType, "pwtype", "t", os.Getenv("MP_PWTYPE"), flagthelp("Password Type"))
 	flag.Uint32VarP(&m.Counter, "counter", "c", 1, "Site password counter value.")
 	flag.UintVarP(&m.fd, "fd", "d", 0, "Read user's master password from given file descriptor.")
 
@@ -78,8 +78,8 @@ func handleFlags(m *MPW) {
 		os.Exit(0)
 	}
 
-	if flagListPWtypes {
-		listPWtypes(m)
+	if flagListPasswordTypes {
+		listPasswordTypes(m)
 		os.Exit(0)
 	}
 

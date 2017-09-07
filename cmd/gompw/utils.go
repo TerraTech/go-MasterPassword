@@ -32,7 +32,7 @@ func fatal(msg string) {
 	log.Fatalf("[Fatal] %s", msg)
 }
 
-func listPWtypes(m *MPW) {
+func listPasswordTypes(m *MPW) {
 	fmt.Println("=Valid Password Types=")
 	fmt.Println(strings.Join(m.GetPasswordTypes(), "\n"))
 }
