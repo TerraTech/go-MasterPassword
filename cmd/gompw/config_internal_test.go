@@ -59,4 +59,38 @@ func TestLoadConfig(t *testing.T) {
 	err := c.LoadConfig("../../files/gompw.toml")
 	ane(t, err)
 	assert.Equal(t, expected, c)
+
+	// test 'Counter' and 'PWtype' defaults when 'omitempty'
+	expected.Counter = 1
+	expected.PWtype = "long"
+
+	c = NewConfig()
+	err = c.LoadConfig("../../files/gompw-omitempty.toml")
+	ane(t, err)
+	assert.Equal(t, expected, c)
+
+	// test against empty gompw.toml
+	expected = Config{
+		PWtype:  "long",
+		Counter: 1,
+	}
+	c = NewConfig()
+	err = c.LoadConfig("../../files/gompw-empty.toml")
+	ane(t, err)
+	assert.Equal(t, expected, c)
+}
+
+func TestMerge(t *testing.T) {
+	var c Config
+
+	expected := Config{
+		Fullname: "TestUser",
+		Password: "liveLifeToTheEdge",
+		PWtype:   "long",
+		Counter:  1,
+	}
+
+	err := c.LoadConfig("../../files/gompw-merge.toml")
+	ane(t, err)
+	assert.Equal(t, expected, c)
 }
