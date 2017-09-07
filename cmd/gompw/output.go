@@ -21,38 +21,13 @@
 package main
 
 import (
+	"fmt"
 	"os"
-	"path"
-
-	"futurequest.net/FQgolibs/FQversion"
-	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
 )
 
-var (
-	PROG string = path.Base(os.Args[0])
-	// VERSION follows the Major.Minor of mpw cli, however .Patch is incremented for changes to gompw
-	VERSION   string = "2.6.0"
-	BUILD     string = FQversion.GetBUILD()
-	BUILDHOST string // Filled via Makefile
-)
-
-type MPW struct {
-	*crypto.MasterPW
-	fd     uint
-	pwFile string
-}
-
-func main() {
-	mpw := &MPW{
-		MasterPW: crypto.NewMasterPassword(),
+func printPassword(mpw *MPW, pw string) {
+	if isaTTY(os.Stdout.Fd()) {
+		fmt.Printf("%s's password for %s:\n", mpw.Fullname, mpw.Site)
 	}
-
-	handleFlags(mpw)
-
-	mPassword, err := mpw.MasterPassword()
-	if err != nil {
-		fatal(err.Error())
-	}
-
-	printPassword(mpw, mPassword)
+	fmt.Println(pw)
 }
