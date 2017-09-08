@@ -27,7 +27,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var D = FQtesting.D
 var ane = FQtesting.ANE
 
 func TestGcfn(t *testing.T) {
