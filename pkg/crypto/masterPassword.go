@@ -44,11 +44,11 @@ const master_password_seed = "com.lyndir.masterpassword"
 // MasterPW contains all relevant items for MasterPassword to act upon.
 type MasterPW struct {
 	// Counter >= 1
-	Counter  uint32
-	PWtype   string
-	Fullname string
-	Password string
-	Site     string
+	Counter  uint32 `toml:"counter,omitempty"`
+	PWtype   string `toml:"passwordType,omitempty"`
+	Fullname string `toml:"fullname,omitempty"`
+	Password string `toml:"password,omitempty"`
+	Site     string `toml:"site,omitempty"`
 }
 
 var password_type_templates = map[string][][]byte{
