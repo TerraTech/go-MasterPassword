@@ -30,7 +30,6 @@ import (
 	"strconv"
 
 	"github.com/TerraTech/go-MasterPassword/pkg/common"
-	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
 	flag "github.com/spf13/pflag"
 )
 
@@ -45,22 +44,22 @@ func handleFlags(m *MPW) {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage: %s [flags] site\n", PROG)
 		flag.PrintDefaults()
-		fmt.Println()
-		fmt.Println("==Environment Variables==")
+		fmt.Println("\n==Environment Variables==")
 		fmt.Println("  MP_CONFIGFILE   | The user configuration file (see -C)")
 		//             MP_DEBUG
 		fmt.Println("  MP_FULLNAME     | The full name of the user (see -u)")
 		fmt.Println("  MP_PWTYPE       | The password type (see -t)")
 		fmt.Println("  MP_SITECOUNTER  | The default counter value (see -c)")
+
+		fmt.Println("\n==User Config file location search order==")
+		fmt.Println("  1) ./gompw.toml")
+		fmt.Println("  2) $HOME/.gompw.toml")
+		fmt.Println("  3) /etc/gompw.toml")
 	}
 
 	default_pwType := m.PasswordType // stuff away default PasswordType
 	var flagShowVersion bool
 	var flagListPasswordTypes bool
-
-	flagthelp := func(msg string) string {
-		return fmt.Sprintf("%s [%s]", msg, crypto.MasterPasswordTypes)
-	}
 
 	// "-v" reserved for '--verbose' if implemented
 	flag.BoolVarP(&flagListPasswordTypes, "listPasswordTypes", "l", false, "List valid Password Types")
@@ -68,10 +67,10 @@ func handleFlags(m *MPW) {
 	flag.BoolVarP(&ignoreConfigFile, "ignoreUserConfig", "I", false, "Ignore user configuration file")
 	flag.StringVarP(&configFile, "config", "C", "", "User configuration file override")
 	flag.StringVarP(&m.Fullname, "fullname", "u", os.Getenv("MP_FULLNAME"), "Fullname")
-	flag.StringVarP(&m.pwFile, "file", "f", "", "Read user's master password from given filename.")
-	flag.StringVarP(&m.PasswordType, "pwtype", "t", os.Getenv("MP_PWTYPE"), flagthelp("Password Type"))
-	flag.Uint32VarP(&m.Counter, "counter", "c", 1, "Site password counter value.")
-	flag.UintVarP(&m.fd, "fd", "d", 0, "Read user's master password from given file descriptor.")
+	flag.StringVarP(&m.pwFile, "file", "f", "", "Read user's master password from given filename")
+	flag.StringVarP(&m.PasswordType, "pwtype", "t", os.Getenv("MP_PWTYPE"), flagHelp("t"))
+	flag.Uint32VarP(&m.Counter, "counter", "c", 1, "Site password counter value")
+	flag.UintVarP(&m.fd, "fd", "d", 0, "Read user's master password from given file descriptor")
 
 	flag.Parse()
 

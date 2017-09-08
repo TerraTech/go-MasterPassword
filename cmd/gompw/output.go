@@ -23,7 +23,32 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 )
+
+const passwordTypeHelpIndent = 28
+
+var passwordTypeHelp = `Specify the password's type template
+Defaults to 'long'
+    x, maximum  | 20 characters, contains symbols
+    l, long     | Copy-friendly, 14 characters, symbols
+    m, medium   | Copy-friendly, 8 characters, symbols
+    b, basic    | 8 characters, no symbols
+    s, short    | Copy-friendly, 4 characters, no symbols
+    i, pin      | 4 numbers
+    n, name     | 9 letter name
+    p, phrase   | 20 character sentence`
+
+func flagHelp(opt string) string {
+	var help string
+	switch opt {
+	case "t":
+		indention := strings.Repeat(" ", passwordTypeHelpIndent)
+		help = strings.Replace(passwordTypeHelp, "\n", "\n"+indention, -1)
+	}
+
+	return help
+}
 
 func printPassword(mpw *MPW, pw string) {
 	if isaTTY(os.Stdout.Fd()) {
