@@ -120,10 +120,10 @@ func (m *MasterPW) IsValidPasswordType(password_type string) bool {
 //
 //   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
 //
-//   NOTE: mpwseed = "", will use the default Master Password Seed, do not change unless you have specific requirements
+//   NOTE: mpwseed == "", will use the default Master Password Seed, do not change unless you have specific requirements
 func MasterPassword(mpwseed, password_type, user, password, site string, counter uint32) (string, error) {
 	if mpwseed == "" {
-		return "", fmt.Errorf("master password seed is not defined")
+		mpwseed = MasterPasswordSeed
 	}
 
 	templates := password_type_templates[password_type]
