@@ -49,6 +49,7 @@ func handleFlags(m *MPW) {
 		//             MP_DEBUG
 		fmt.Println("  MP_FULLNAME     | The full name of the user (see -u)")
 		fmt.Println("  MP_PWTYPE       | The password type (see -t)")
+		fmt.Println("  MP_SEED         | The master password seed (see -S)")
 		fmt.Println("  MP_SITECOUNTER  | The default counter value (see -c)")
 
 		fmt.Println("\n==User Config file location search order==")
@@ -67,8 +68,9 @@ func handleFlags(m *MPW) {
 	flag.BoolVarP(&ignoreConfigFile, "ignoreUserConfig", "I", false, "Ignore user configuration file")
 	flag.StringVarP(&configFile, "config", "C", "", "User configuration file override")
 	flag.StringVarP(&m.Fullname, "fullname", "u", os.Getenv("MP_FULLNAME"), "Fullname")
-	flag.StringVarP(&m.pwFile, "file", "f", "", "Read user's master password from given filename")
+	flag.StringVarP(&m.MasterPasswordSeed, "mpseed", "S", os.Getenv("MP_SEED"), "Override the Master Password Seed")
 	flag.StringVarP(&m.PasswordType, "pwtype", "t", os.Getenv("MP_PWTYPE"), flagHelp("t"))
+	flag.StringVarP(&m.pwFile, "file", "f", "", "Read user's master password from given filename")
 	flag.Uint32VarP(&m.Counter, "counter", "c", 1, "Site password counter value")
 	flag.UintVarP(&m.fd, "fd", "d", 0, "Read user's master password from given file descriptor")
 
