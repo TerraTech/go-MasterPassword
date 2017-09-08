@@ -39,10 +39,17 @@ type mpw struct {
 }
 
 type testVector struct {
-	ms           string
-	c            uint32
-	pt, u, pw, s string
-	expect       string
+	ms     string
+	c      uint32
+	pt     string
+	expect string
+}
+
+// d == default
+var d = struct {
+	u, pw, s string
+}{
+	"user", "password", "example.com",
 }
 
 func newMpw(tv testVector) *mpw {
@@ -51,38 +58,38 @@ func newMpw(tv testVector) *mpw {
 			MasterPasswordSeed: tv.ms,
 			Counter:            tv.c,
 			PasswordType:       tv.pt,
-			Fullname:           tv.u,
-			Password:           tv.pw,
-			Site:               tv.s,
+			Fullname:           d.u,
+			Password:           d.pw,
+			Site:               d.s,
 		},
 	}
 }
 
 func TestMasterPassword(t *testing.T) {
 	expectations := []testVector{
-		{mpwseeds[0], 1, "long", "user", "password", "example.com", "ZedaFaxcZaso9*"},
-		{mpwseeds[0], 2, "long", "user", "password", "example.com", "Fovi2@JifpTupx"},
-		{mpwseeds[0], 1, "maximum", "user", "password", "example.com", "pf4zS1LjCg&LjhsZ7T2~"},
-		{mpwseeds[0], 1, "medium", "user", "password", "example.com", "ZedJuz8$"},
-		{mpwseeds[0], 1, "basic", "user", "password", "example.com", "pIS54PLs"},
-		{mpwseeds[0], 1, "short", "user", "password", "example.com", "Zed5"},
-		{mpwseeds[0], 1, "pin", "user", "password", "example.com", "6685"},
-		{mpwseeds[0], 1, "name", "user", "password", "example.com", "zedjuzoco"},
-		{mpwseeds[0], 1, "phrase", "user", "password", "example.com", "ze juzxo sax taxocre"},
+		{mpwseeds[0], 1, "long", "ZedaFaxcZaso9*"},
+		{mpwseeds[0], 2, "long", "Fovi2@JifpTupx"},
+		{mpwseeds[0], 1, "maximum", "pf4zS1LjCg&LjhsZ7T2~"},
+		{mpwseeds[0], 1, "medium", "ZedJuz8$"},
+		{mpwseeds[0], 1, "basic", "pIS54PLs"},
+		{mpwseeds[0], 1, "short", "Zed5"},
+		{mpwseeds[0], 1, "pin", "6685"},
+		{mpwseeds[0], 1, "name", "zedjuzoco"},
+		{mpwseeds[0], 1, "phrase", "ze juzxo sax taxocre"},
 	}
 
 	expectations_bad := []testVector{
-		{mpwseeds[0], 1, "invalidType", "user", "password", "example.com", "1111"},
+		{mpwseeds[0], 1, "invalidType", "1111"},
 	}
 
 	for _, tv := range expectations {
-		pw, err := crypto.MasterPassword(tv.ms, tv.pt, tv.u, tv.pw, tv.s, tv.c)
+		pw, err := crypto.MasterPassword(tv.ms, tv.pt, d.u, d.pw, d.s, tv.c)
 		assert.NoError(t, err)
 		assert.Equal(t, tv.expect, pw)
 	}
 
 	for _, tv := range expectations_bad {
-		_, err := crypto.MasterPassword(tv.ms, tv.pt, tv.u, tv.pw, tv.s, tv.c)
+		_, err := crypto.MasterPassword(tv.ms, tv.pt, d.u, d.pw, d.s, tv.c)
 		assert.Error(t, err)
 	}
 
@@ -92,5 +99,53 @@ func TestMasterPassword(t *testing.T) {
 		pw, err := mpw.MasterPassword()
 		assert.NoError(t, err)
 		assert.Equal(t, tv.expect, pw)
+	}
+}
+
+func TestMasterPasswordSeeds(t *testing.T) {
+	expectations := [][]testVector{
+		{
+			{mpwseeds[1], 1, "long", "NukiConqYocu1*"},
+			{mpwseeds[1], 2, "long", "MiwkVuruDile0_"},
+			{mpwseeds[1], 1, "maximum", "CR(m#EbdFijOx8u!bX1$"},
+			{mpwseeds[1], 1, "medium", "NukKun1:"},
+			{mpwseeds[1], 1, "basic", "CbL24Pbd"},
+			{mpwseeds[1], 1, "short", "Nuk2"},
+			{mpwseeds[1], 1, "pin", "5902"},
+			{mpwseeds[1], 1, "name", "nukkunequ"},
+			{mpwseeds[1], 1, "phrase", "nu kunno rom tolivna"},
+		},
+		{
+			{mpwseeds[2], 1, "long", "GibuKaqoNeld5/"},
+			{mpwseeds[2], 2, "long", "QuncPute3/Wuzk"},
+			{mpwseeds[2], 1, "maximum", "a7?OMCHdbHoa1Q4&mc2)"},
+			{mpwseeds[2], 1, "medium", "Gib9;Luq"},
+			{mpwseeds[2], 1, "basic", "aiq91zOd"},
+			{mpwseeds[2], 1, "short", "Gib9"},
+			{mpwseeds[2], 1, "pin", "9779"},
+			{mpwseeds[2], 1, "name", "gibmeluqe"},
+			{mpwseeds[2], 1, "phrase", "gi melqo bod kahuwqa"},
+		},
+		{
+			{mpwseeds[3], 1, "long", "Mobl2-BicuKasp"},
+			{mpwseeds[3], 2, "long", "JeyzXawx5~Heye"},
+			{mpwseeds[3], 1, "maximum", "z3)1NfH6^3B(octEFYFU"},
+			{mpwseeds[3], 1, "medium", "Mob7(Rer"},
+			{mpwseeds[3], 1, "basic", "zuP7mfR2"},
+			{mpwseeds[3], 1, "short", "Mob7"},
+			{mpwseeds[3], 1, "pin", "1317"},
+			{mpwseeds[3], 1, "name", "moblirere"},
+			{mpwseeds[3], 1, "phrase", "mobl rer nuksiri wuc"},
+		},
+	}
+
+	for seedn, tvs := range expectations {
+		for _, tv := range tvs {
+			mpw := newMpw(tv)
+			mpw.MasterPasswordSeed = mpwseeds[seedn+1]
+			pw, err := mpw.MasterPassword()
+			assert.NoError(t, err)
+			assert.Equal(t, tv.expect, pw)
+		}
 	}
 }
