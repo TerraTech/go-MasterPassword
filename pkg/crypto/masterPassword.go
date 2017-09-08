@@ -33,10 +33,10 @@ import (
 )
 
 // MpwSeries denotes the mpw cli client version compatibility.
-//   This is mostly for tracking the password type templates.
 const MpwSeries = "2.6"
 
 // MasterPasswordTypes is for listing the current supported password types.
+//
 //   Default: long
 const MasterPasswordTypes = "basic, long, maximum, medium, name, phrase, pin, short"
 
@@ -90,7 +90,8 @@ func NewMasterPassword() *MasterPW {
 }
 
 // MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
-// Valid password_types: maximum, long, medium, short, basic, pin
+//
+//   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
 func (m *MasterPW) MasterPassword() (string, error) {
 	return MasterPassword(m.Counter, m.PasswordType, m.Fullname, m.Password, m.Site)
 }
@@ -115,6 +116,8 @@ func (m *MasterPW) IsValidPasswordType(password_type string) bool {
 }
 
 // MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
+//
+//   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
 func MasterPassword(counter uint32, password_type, user, password, site string) (string, error) {
 	templates := password_type_templates[password_type]
 	if templates == nil {
