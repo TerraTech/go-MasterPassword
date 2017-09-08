@@ -46,11 +46,12 @@ const MasterPasswordSeed = "com.lyndir.masterpassword"
 
 // MasterPW contains all relevant items for MasterPassword to act upon.
 type MasterPW struct {
-	PasswordType string `toml:"passwordType,omitempty"`
-	Fullname     string `toml:"fullname,omitempty"`
-	Password     string `toml:"password,omitempty"`
-	Site         string `toml:"site,omitempty"`
-	Counter      uint32 `toml:"counter,omitempty"` // Counter >= 1
+	MasterPasswordSeed string `toml:"masterPasswordSeed,omitempty"`
+	PasswordType       string `toml:"passwordType,omitempty"`
+	Fullname           string `toml:"fullname,omitempty"`
+	Password           string `toml:"password,omitempty"`
+	Site               string `toml:"site,omitempty"`
+	Counter            uint32 `toml:"counter,omitempty"` // Counter >= 1
 }
 
 var password_type_templates = map[string][][]byte{
@@ -93,7 +94,7 @@ func NewMasterPassword() *MasterPW {
 //
 //   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
 func (m *MasterPW) MasterPassword() (string, error) {
-	return MasterPassword(m.Counter, m.PasswordType, m.Fullname, m.Password, m.Site)
+	return MasterPassword(m.MasterPasswordSeed, m.PasswordType, m.Fullname, m.Password, m.Site, m.Counter)
 }
 
 // GetPasswordTypes returns a sorted list of valid password types
@@ -118,7 +119,13 @@ func (m *MasterPW) IsValidPasswordType(password_type string) bool {
 // MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
 //
 //   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
-func MasterPassword(counter uint32, password_type, user, password, site string) (string, error) {
+//
+//   NOTE: mpwseed == "", will use the default Master Password Seed, do not change unless you have specific requirements
+func MasterPassword(mpwseed, password_type, user, password, site string, counter uint32) (string, error) {
+	if mpwseed == "" {
+		mpwseed = MasterPasswordSeed
+	}
+
 	templates := password_type_templates[password_type]
 	if templates == nil {
 		return "", fmt.Errorf("cannot find password template %s", password_type)
@@ -129,7 +136,7 @@ func MasterPassword(counter uint32, password_type, user, password, site string) 
 	}
 
 	var buffer bytes.Buffer
-	buffer.WriteString(MasterPasswordSeed)
+	buffer.WriteString(mpwseed)
 	binary.Write(&buffer, binary.BigEndian, uint32(len(user)))
 	buffer.WriteString(user)
 
@@ -139,7 +146,7 @@ func MasterPassword(counter uint32, password_type, user, password, site string) 
 		return "", fmt.Errorf("failed to derive password: %s", err)
 	}
 
-	buffer.Truncate(len(MasterPasswordSeed))
+	buffer.Truncate(len(mpwseed))
 	binary.Write(&buffer, binary.BigEndian, uint32(len(site)))
 	buffer.WriteString(site)
 	binary.Write(&buffer, binary.BigEndian, counter)

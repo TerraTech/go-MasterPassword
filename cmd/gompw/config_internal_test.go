@@ -48,16 +48,20 @@ func TestLoadConfig(t *testing.T) {
 	var c Config
 
 	expected := Config{
-		Fullname:     "TestUser",
-		Password:     "liveLifeToTheEdge",
-		PasswordType: "maximum",
-		Site:         "FutureQuest.net",
-		Counter:      69,
+		MasterPasswordSeed: "overrideDefaultMPWseed",
+		Fullname:           "TestUser",
+		Password:           "liveLifeToTheEdge",
+		PasswordType:       "maximum",
+		Site:               "FutureQuest.net",
+		Counter:            69,
 	}
 
 	err := c.LoadConfig("../../files/gompw.toml")
 	ane(t, err)
 	assert.Equal(t, expected, c)
+
+	// MasterPasswordSeed is only overridden in first test
+	expected.MasterPasswordSeed = ""
 
 	// test 'Counter' and 'PasswordType' defaults when 'omitempty'
 	expected.Counter = 1

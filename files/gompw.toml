@@ -1,3 +1,4 @@
+masterPasswordSeed = "overrideDefaultMPWseed"
 fullname = "TestUser"
 password = "liveLifeToTheEdge"
 passwordType = "maximum"
