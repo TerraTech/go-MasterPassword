@@ -66,6 +66,7 @@ func handleFlags(m *MPW) {
 	flag.BoolVarP(&flagListPasswordTypes, "listPasswordTypes", "l", false, "List valid Password Types")
 	flag.BoolVarP(&flagShowVersion, "version", "V", false, "Show version")
 	flag.BoolVarP(&ignoreConfigFile, "ignoreUserConfig", "I", false, "Ignore user configuration file")
+	flag.BoolVar(&m.ssp, "ssp", false, "Shoulder Surfing Prevention by not echoing any terminal input")
 	flag.StringVarP(&configFile, "config", "C", "", "User configuration file override")
 	flag.StringVarP(&m.Fullname, "fullname", "u", os.Getenv("MP_FULLNAME"), "Fullname")
 	flag.StringVarP(&m.MasterPasswordSeed, "mpseed", "S", os.Getenv("MP_SEED"), "Override the Master Password Seed")
@@ -90,11 +91,6 @@ func handleFlags(m *MPW) {
 		os.Exit(0)
 	}
 
-	if len(flag.Args()) == 0 {
-		flag.Usage()
-		os.Exit(0)
-	}
-
 	// -d and -f are mutually exclusive
 	if flag.ShorthandLookup("d").Changed && flag.ShorthandLookup("f").Changed {
 		fatal("-d and -f are mutually exclusive.")
@@ -110,13 +106,20 @@ func handleFlags(m *MPW) {
 		config.Merge(m)
 	}
 
-	if m.Fullname == "" {
-		fatal("Fullname must be specified")
+	getResponse := func(prompt, errMsg string) string {
+		input, err := readInput(prompt, m.ssp)
+		if err != nil {
+			fatal(err.Error())
+		}
+		if input == "" {
+			fatal(errMsg)
+		}
+
+		return input
 	}
 
-	m.Site = flag.Arg(0)
-	if m.Site == "" {
-		fatal("Site must be specified")
+	if m.Fullname == "" {
+		m.Fullname = getResponse("Your full name: ", "Fullname must be specified")
 	}
 
 	// read password from io.Reader
@@ -124,6 +127,7 @@ func handleFlags(m *MPW) {
 	// 1) -f
 	// 2) -d
 	// 3) stdin
+	var errNoPassword = "Password must be specified"
 	if flag.ShorthandLookup("f").Changed || flag.ShorthandLookup("d").Changed {
 		if flag.ShorthandLookup("f").Changed {
 			DEBUG("pwInput: file")
@@ -144,24 +148,20 @@ func handleFlags(m *MPW) {
 		if err != nil {
 			fatal(err.Error())
 		}
+
+		m.Password = string(bytes.TrimSpace(pwBytes))
+
+		if m.Password == "" {
+			fatal(errNoPassword)
+		}
 	} else {
 		DEBUG("pwInput: stdin")
-		fd := os.Stdin.Fd()
-		if isaTTY(fd) {
-			if isaTTY(os.Stderr.Fd()) {
-				fmt.Fprintf(os.Stderr, "Your master password: ")
-				pwBytes, err = readPassword(fd)
-				fmt.Fprintln(os.Stderr)
-			} else {
-				pwBytes, err = readPassword(fd)
-			}
-		}
+		m.Password = getResponse("Your master password: ", errNoPassword)
 	}
 
-	m.Password = string(bytes.TrimSpace(pwBytes))
-
-	if m.Password == "" {
-		fatal("Password must be specified")
+	m.Site = flag.Arg(0)
+	if m.Site == "" {
+		m.Site = getResponse("Site name: ", "Site must be specified")
 	}
 
 	// handle pwType

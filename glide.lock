@@ -1,5 +1,5 @@
 hash: 646419524e72816e83e9067d96998307fe1fd02160d80c48f3eb4325be49d3c1
-updated: 2017-09-07T08:59:34.500494068-04:00
+updated: 2017-09-08T20:27:21.515970148-04:00
 imports:
 - name: github.com/goruha/permbits
   version: b7b74f7b45ae871ecc96e07e9abe5225b366c66b
@@ -14,7 +14,7 @@ imports:
   - scrypt
   - ssh/terminal
 - name: golang.org/x/sys
-  version: 9aade4d3a3b7e6d876cd3823ad20ec45fc035402
+  version: 5513e650ab47a692d3a036d49be8fa52ddd09b65
   subpackages:
   - unix
   - windows

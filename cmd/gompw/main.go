@@ -40,6 +40,7 @@ type MPW struct {
 	*crypto.MasterPW
 	fd     uint
 	pwFile string
+	ssp    bool
 }
 
 func main() {
