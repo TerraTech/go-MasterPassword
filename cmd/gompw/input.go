@@ -23,36 +23,21 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
+
+	"futurequest.net/FQgolibs/FQterm"
 )
 
-const passwordTypeHelpIndent = 28
+func readInput(prompt string, ssp bool) (string, error) {
+	var input string
+	var err error
 
-var passwordTypeHelp = `Specify the password's type template
-Defaults to 'long'
-    x, maximum  | 20 characters, contains symbols
-    l, long     | Copy-friendly, 14 characters, symbols
-    m, medium   | Copy-friendly, 8 characters, symbols
-    b, basic    | 8 characters, no symbols
-    s, short    | Copy-friendly, 4 characters, no symbols
-    i, pin      | 4 numbers
-    n, name     | 9 letter name
-    p, phrase   | 20 character sentence`
-
-func flagHelp(opt string) string {
-	var help string
-	switch opt {
-	case "t":
-		indention := strings.Repeat(" ", passwordTypeHelpIndent)
-		help = strings.Replace(passwordTypeHelp, "\n", "\n"+indention, -1)
+	fmt.Fprint(os.Stderr, prompt)
+	if ssp {
+		input, err = FQterm.ReadPassword(os.Stdin)
+		fmt.Fprintln(os.Stderr)
+	} else {
+		input, err = FQterm.ReadInput(os.Stdin)
 	}
 
-	return help
-}
-
-func printPassword(mpw *MPW, pw string) {
-	if !mpw.ssp && isaTTY(os.Stdout.Fd()) {
-		fmt.Printf("%s's password for %s:\n", mpw.Fullname, mpw.Site)
-	}
-	fmt.Println(pw)
+	return input, err
 }
