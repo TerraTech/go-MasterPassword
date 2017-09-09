@@ -30,8 +30,7 @@ import (
 
 var (
 	PROG string = path.Base(os.Args[0])
-	// VERSION follows the Major.Minor of mpw cli, however .Patch is incremented for changes to gompw
-	VERSION   string = "2.6.0"
+	VERSION   string // Filled via Makefile
 	BUILD     string = FQversion.GetBUILD()
 	BUILDHOST string // Filled via Makefile
 )
