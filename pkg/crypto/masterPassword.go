@@ -54,7 +54,8 @@ type MasterPW struct {
 	Counter            uint32 `toml:"counter,omitempty"` // Counter >= 1
 }
 
-var password_type_templates = map[string][][]byte{
+func getPTT() map[string][][]byte {
+	ptt := map[string][][]byte{
 	"basic": {[]byte("aaanaaan"), []byte("aannaaan"), []byte("aaannaaa")},
 	"long": {[]byte("CvcvnoCvcvCvcv"), []byte("CvcvCvcvnoCvcv"), []byte("CvcvCvcvCvcvno"), []byte("CvccnoCvcvCvcv"), []byte("CvccCvcvnoCvcv"),
 		[]byte("CvccCvcvCvcvno"), []byte("CvcvnoCvccCvcv"), []byte("CvcvCvccnoCvcv"), []byte("CvcvCvccCvcvno"), []byte("CvcvnoCvcvCvcc"),
@@ -67,7 +68,21 @@ var password_type_templates = map[string][][]byte{
 	"phrase":  {[]byte("cvcc cvc cvccvcv cvc"), []byte("cvc cvccvcvcv cvcv"), []byte("cv cvccv cvc cvcvccv")},
 	"pin":     {[]byte("nnnn")},
 	"short":   {[]byte("Cvcn")},
+	}
+
+	// add shortcodes
+	ptt["b"] = ptt["basic"]
+	ptt["l"] = ptt["long"]
+	ptt["x"] = ptt["maximum"]
+	ptt["m"] = ptt["medium"]
+	ptt["n"] = ptt["name"]
+	ptt["p"] = ptt["phrase"]
+	ptt["i"] = ptt["pin"]
+	ptt["s"] = ptt["short"]
+
+	return ptt
 }
+var passwordTypeTemplates = getPTT()
 
 var template_characters = map[byte]string{
 	'V': "AEIOU",
@@ -99,9 +114,9 @@ func (m *MasterPW) MasterPassword() (string, error) {
 
 // GetPasswordTypes returns a sorted list of valid password types
 func (m *MasterPW) GetPasswordTypes() []string {
-	keys := make([]string, len(password_type_templates))
+	keys := make([]string, len(passwordTypeTemplates))
 	i := 0
-	for k, _ := range password_type_templates {
+	for k, _ := range passwordTypeTemplates {
 		keys[i] = k
 		i++
 	}
@@ -111,8 +126,8 @@ func (m *MasterPW) GetPasswordTypes() []string {
 	return keys
 }
 
-func (m *MasterPW) IsValidPasswordType(password_type string) bool {
-	_, exists := password_type_templates[password_type]
+func (m *MasterPW) IsValidPasswordType(passwordType string) bool {
+	_, exists := passwordTypeTemplates[passwordType]
 	return exists
 }
 
@@ -121,14 +136,14 @@ func (m *MasterPW) IsValidPasswordType(password_type string) bool {
 //   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
 //
 //   NOTE: mpwseed == "", will use the default Master Password Seed, do not change unless you have specific requirements
-func MasterPassword(mpwseed, password_type, user, password, site string, counter uint32) (string, error) {
+func MasterPassword(mpwseed, passwordType, user, password, site string, counter uint32) (string, error) {
 	if mpwseed == "" {
 		mpwseed = MasterPasswordSeed
 	}
 
-	templates := password_type_templates[password_type]
+	templates := passwordTypeTemplates[passwordType]
 	if templates == nil {
-		return "", fmt.Errorf("cannot find password template %s", password_type)
+		return "", fmt.Errorf("cannot find password template %s", passwordType)
 	}
 
 	if err := common.ValidateSiteCounter(counter); err != nil {
