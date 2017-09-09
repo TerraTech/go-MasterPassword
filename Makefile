@@ -1,13 +1,14 @@
-PROJ=go-MasterPassword
-export CLI=gompw
-ORG_PATH=github.com/TerraTech
-REPO_PATH=$(ORG_PATH)/$(PROJ)
-CMD_PATH=$(REPO_PATH)/cmd
+PROJ := go-MasterPassword
+VERSION := $(shell git describe --tags --dirty)
+export CLI := gompw
+ORG_PATH := github.com/TerraTech
+REPO_PATH := $(ORG_PATH)/$(PROJ)
+CMD_PATH := $(REPO_PATH)/cmd
 export PATH := $(PWD)/bin:$(PATH)
 
-FQGOLIBS_PATH=$(GOPATH)/src/futurequest.net/FQgolibs-Public/
-VENDOR_DST=futurequest.net/FQgolibs
-VENDOR_SUBPKGS_FQ=FQdebug FQfile FQtesting FQversion
+FQGOLIBS_PATH := $(GOPATH)/src/futurequest.net/FQgolibs-Public/
+VENDOR_DST := futurequest.net/FQgolibs
+VENDOR_SUBPKGS_FQ := FQdebug FQfile FQtesting FQversion
 
 GOFILES := $(filter-out ./vendor/% ./@_VERSION_@.go,$(shell find ./ -type f -name '*.go' -print))
 
@@ -18,7 +19,7 @@ $( shell mkdir -p bin )
 user=$(shell id -u -n)
 group=$(shell id -g -n)
 
-LD_FLAGS="-w -X main.BUILDHOST=$(BUILDHOST)"
+LD_FLAGS="-w -X main.VERSION=$(VERSION) -X main.BUILDHOST=$(BUILDHOST)"
 
 build: bin/$(CLI)
 
