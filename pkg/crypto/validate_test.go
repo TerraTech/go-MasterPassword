@@ -27,6 +27,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestValidateCounter(t *testing.T) {
+	// good
+	assert.NoError(t, crypto.ValidateCounter(1))
+	assert.NoError(t, crypto.ValidateCounter(9999))
+
+	// bad
+	assert.Error(t, crypto.ErrCounter, crypto.ValidateCounter(0))
+}
+
 func TestValidateFullname(t *testing.T) {
 	// good
 	assert.NoError(t, crypto.ValidateFullname("Terra"))

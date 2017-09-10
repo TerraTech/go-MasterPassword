@@ -28,7 +28,6 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/TerraTech/go-MasterPassword/pkg/common"
 	"golang.org/x/crypto/scrypt"
 )
 

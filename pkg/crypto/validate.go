@@ -25,6 +25,7 @@ import (
 )
 
 var (
+	ErrCounter                 = errors.New("site password counter must be >= 1")
 	ErrFullnameEmpty           = errors.New("Site fullname must be set")
 	ErrMasterPasswordSeedEmpty = errors.New("MasterPassword seed must be set")
 	ErrPasswordEmpty           = errors.New("Site password must be set")
@@ -32,6 +33,15 @@ var (
 	ErrPasswordTypeInvalid     = errors.New("Password type is invalid")
 	ErrSiteEmpty               = errors.New("Site name must be set")
 )
+
+// ValidateCounter validates that the site counter value is >= 1
+func ValidateCounter(counter uint32) error {
+	if counter < 1 {
+		return ErrCounter
+	}
+
+	return nil
+}
 
 // ValidateFullname validates that fullname is not empty
 func ValidateFullname(fullname string) error {
