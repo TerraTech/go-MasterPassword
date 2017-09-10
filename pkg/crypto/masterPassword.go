@@ -61,46 +61,35 @@ func NewMasterPassword() *MasterPW {
 // MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
 //
 //   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
-func (m *MasterPW) MasterPassword() (string, error) {
-	return MasterPassword(m.MasterPasswordSeed, m.PasswordType, m.Fullname, m.Password, m.Site, m.Counter)
-}
-
+func (mpw *MasterPW) MasterPassword() (string, error) {
+	if mpw.masterPasswordSeed == "" {
+		mpw.masterPasswordSeed = MasterPasswordSeed
 	}
 
-// MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
-//
-//   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
-//
-//   NOTE: mpwseed == "", will use the default Master Password Seed, do not change unless you have specific requirements
-func MasterPassword(mpwseed, passwordType, user, password, site string, counter uint32) (string, error) {
-	if mpwseed == "" {
-		mpwseed = MasterPasswordSeed
-	}
-
-	templates := passwordTypeTemplates[passwordType]
+	templates := passwordTypeTemplates[mpw.passwordType]
 	if templates == nil {
-		return "", fmt.Errorf("cannot find password template %s", passwordType)
+		return "", fmt.Errorf("cannot find password template %s", mpw.passwordType)
 	}
 
-	if err := common.ValidateSiteCounter(counter); err != nil {
+	if err := ValidateCounter(mpw.counter); err != nil {
 		return "", err
 	}
 
 	var buffer bytes.Buffer
-	buffer.WriteString(mpwseed)
-	binary.Write(&buffer, binary.BigEndian, uint32(len(user)))
-	buffer.WriteString(user)
+	buffer.WriteString(mpw.masterPasswordSeed)
+	binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.fullname)))
+	buffer.WriteString(mpw.fullname)
 
 	salt := buffer.Bytes()
-	key, err := scrypt.Key([]byte(password), salt, 32768, 8, 2, 64)
+	key, err := scrypt.Key([]byte(mpw.password), salt, 32768, 8, 2, 64)
 	if err != nil {
-		return "", fmt.Errorf("failed to derive password: %s", err)
+		return "", fmt.Errorf("failed to generate password: %s", err)
 	}
 
-	buffer.Truncate(len(mpwseed))
-	binary.Write(&buffer, binary.BigEndian, uint32(len(site)))
-	buffer.WriteString(site)
-	binary.Write(&buffer, binary.BigEndian, counter)
+	buffer.Truncate(len(mpw.masterPasswordSeed))
+	binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.site)))
+	buffer.WriteString(mpw.site)
+	binary.Write(&buffer, binary.BigEndian, mpw.counter)
 
 	var hmacv = hmac.New(sha256.New, key)
 	hmacv.Write(buffer.Bytes())
@@ -109,10 +98,28 @@ func MasterPassword(mpwseed, passwordType, user, password, site string, counter 
 
 	buffer.Truncate(0)
 	for i, element := range temp {
-		pass_chars := template_characters[element]
-		pass_char := pass_chars[int(seed[i+1])%len(pass_chars)]
-		buffer.WriteByte(pass_char)
+		passChars := templateCharacters[element]
+		passChar := passChars[int(seed[i+1])%len(passChars)]
+		buffer.WriteByte(passChar)
 	}
 
 	return buffer.String(), nil
+}
+
+// MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
+//
+//   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
+//
+//   NOTE: mpwseed == "", will use the default Master Password Seed, do not change unless you have specific requirements
+func MasterPassword(mpwseed, passwordType, fullname, password, site string, counter uint32) (string, error) {
+	mpw := &MasterPW{
+		masterPasswordSeed: mpwseed,
+		passwordType:       passwordType,
+		fullname:           fullname,
+		password:           password,
+		site:               site,
+		counter:            counter,
+	}
+
+	return mpw.MasterPassword()
 }
