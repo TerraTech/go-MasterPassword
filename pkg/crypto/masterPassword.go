@@ -45,6 +45,7 @@ const DefaultMasterPasswordSeed = common.DefaultMasterPasswordSeed
 type MasterPW struct {
 	Config             *config.MPConfig
 	masterPasswordSeed string
+	passwordPurpose    PasswordPurpose
 	passwordType       string
 	fullname           string
 	password           string
@@ -123,11 +124,12 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 // MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
 //
 //   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
-func MasterPassword(mpwseed, passwordType, fullname, password, site string, counter uint32) (string, error) {
+func MasterPassword(mpwseed, passwordType, passwordPurpose, fullname, password, site string, counter uint32) (string, error) {
 	mpw := &MasterPW{
 		Config:             &config.MPConfig{},
 		masterPasswordSeed: mpwseed,
 		passwordType:       passwordType,
+		passwordPurpose:    passwordPurpose,
 		fullname:           fullname,
 		password:           password,
 		site:               site,
