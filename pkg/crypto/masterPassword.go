@@ -39,21 +39,22 @@ const MasterPasswordSeed = "com.lyndir.masterpassword"
 
 // MasterPW contains all relevant items for MasterPassword to act upon.
 type MasterPW struct {
-	MasterPasswordSeed string `toml:"masterPasswordSeed,omitempty"`
-	PasswordType       string `toml:"passwordType,omitempty"`
-	Fullname           string `toml:"fullname,omitempty"`
-	Password           string `toml:"password,omitempty"`
-	Site               string `toml:"site,omitempty"`
-	Counter            uint32 `toml:"counter,omitempty"` // Counter >= 1
-}
-
+	*MPConfig
+	masterPasswordSeed string
+	passwordType       string
+	fullname           string
+	password           string
+	site               string
+	counter            uint32
 }
 
 // NewMasterPassword returns a new empty MasterPW struct with counter==1 and pwtype=="long"
 func NewMasterPassword() *MasterPW {
 	return &MasterPW{
-		Counter:      1,
-		PasswordType: "long",
+		MPConfig:           NewMPConfig(),
+		masterPasswordSeed: MasterPasswordSeed,
+		counter:            1,
+		passwordType:       "long",
 	}
 }
 
