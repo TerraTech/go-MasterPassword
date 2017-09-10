@@ -26,18 +26,12 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"fmt"
-	"sort"
 
 	"golang.org/x/crypto/scrypt"
 )
 
 // MpwSeries denotes the mpw cli client version compatibility.
 const MpwSeries = "2.6"
-
-// MasterPasswordTypes is for listing the current supported password types.
-//
-//   Default: long
-const MasterPasswordTypes = "basic, long, maximum, medium, name, phrase, pin, short"
 
 // MasterPasswordSeed is the default seed and allows it to be compatible with
 // http://masterpasswordapp.com/algorithm.html
@@ -53,47 +47,6 @@ type MasterPW struct {
 	Counter            uint32 `toml:"counter,omitempty"` // Counter >= 1
 }
 
-func getPTT() map[string][][]byte {
-	ptt := map[string][][]byte{
-	"basic": {[]byte("aaanaaan"), []byte("aannaaan"), []byte("aaannaaa")},
-	"long": {[]byte("CvcvnoCvcvCvcv"), []byte("CvcvCvcvnoCvcv"), []byte("CvcvCvcvCvcvno"), []byte("CvccnoCvcvCvcv"), []byte("CvccCvcvnoCvcv"),
-		[]byte("CvccCvcvCvcvno"), []byte("CvcvnoCvccCvcv"), []byte("CvcvCvccnoCvcv"), []byte("CvcvCvccCvcvno"), []byte("CvcvnoCvcvCvcc"),
-		[]byte("CvcvCvcvnoCvcc"), []byte("CvcvCvcvCvccno"), []byte("CvccnoCvccCvcv"), []byte("CvccCvccnoCvcv"), []byte("CvccCvccCvcvno"),
-		[]byte("CvcvnoCvccCvcc"), []byte("CvcvCvccnoCvcc"), []byte("CvcvCvccCvccno"), []byte("CvccnoCvcvCvcc"), []byte("CvccCvcvnoCvcc"),
-		[]byte("CvccCvcvCvccno")},
-	"maximum": {[]byte("anoxxxxxxxxxxxxxxxxx"), []byte("axxxxxxxxxxxxxxxxxno")},
-	"medium":  {[]byte("CvcnoCvc"), []byte("CvcCvcno")},
-	"name":    {[]byte("cvccvcvcv")},
-	"phrase":  {[]byte("cvcc cvc cvccvcv cvc"), []byte("cvc cvccvcvcv cvcv"), []byte("cv cvccv cvc cvcvccv")},
-	"pin":     {[]byte("nnnn")},
-	"short":   {[]byte("Cvcn")},
-	}
-
-	// add shortcodes
-	ptt["b"] = ptt["basic"]
-	ptt["l"] = ptt["long"]
-	ptt["x"] = ptt["maximum"]
-	ptt["m"] = ptt["medium"]
-	ptt["n"] = ptt["name"]
-	ptt["p"] = ptt["phrase"]
-	ptt["i"] = ptt["pin"]
-	ptt["s"] = ptt["short"]
-
-	return ptt
-}
-var passwordTypeTemplates = getPTT()
-
-var template_characters = map[byte]string{
-	'V': "AEIOU",
-	'C': "BCDFGHJKLMNPQRSTVWXYZ",
-	'v': "aeiou",
-	'c': "bcdfghjklmnpqrstvwxyz",
-	'A': "AEIOUBCDFGHJKLMNPQRSTVWXYZ",
-	'a': "AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz",
-	'n': "0123456789",
-	'o': "@&%?,=[]_:-+*$#!'^~;()/.",
-	'x': "AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz0123456789!@#$%^&*()",
-	' ': " ",
 }
 
 // NewMasterPassword returns a new empty MasterPW struct with counter==1 and pwtype=="long"
@@ -111,24 +64,7 @@ func (m *MasterPW) MasterPassword() (string, error) {
 	return MasterPassword(m.MasterPasswordSeed, m.PasswordType, m.Fullname, m.Password, m.Site, m.Counter)
 }
 
-// GetPasswordTypes returns a sorted list of valid password types
-func (m *MasterPW) GetPasswordTypes() []string {
-	keys := make([]string, len(passwordTypeTemplates))
-	i := 0
-	for k, _ := range passwordTypeTemplates {
-		keys[i] = k
-		i++
 	}
-
-	sort.Strings(keys)
-
-	return keys
-}
-
-func (m *MasterPW) IsValidPasswordType(passwordType string) bool {
-	_, exists := passwordTypeTemplates[passwordType]
-	return exists
-}
 
 // MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
 //
