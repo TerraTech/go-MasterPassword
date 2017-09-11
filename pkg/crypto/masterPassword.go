@@ -59,8 +59,9 @@ func NewMasterPassword() *MasterPW {
 //
 //   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
 func (mpw *MasterPW) MasterPassword() (string, error) {
-	if mpw.masterPasswordSeed == "" {
-		mpw.masterPasswordSeed = MasterPasswordSeed
+	// merge (and validate) Config ==> MasterPW
+	if err := mpw.MergeConfig(); err != nil {
+		return "", err
 	}
 
 	templates := passwordTypeTemplates[mpw.passwordType]
