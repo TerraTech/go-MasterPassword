@@ -28,6 +28,7 @@ import (
 	"fmt"
 
 	"github.com/TerraTech/go-MasterPassword/pkg/common"
+	"github.com/TerraTech/go-MasterPassword/pkg/config"
 	"golang.org/x/crypto/scrypt"
 )
 
@@ -40,7 +41,7 @@ const MasterPasswordSeed = common.MasterPasswordSeed
 
 // MasterPW contains all relevant items for MasterPassword to act upon.
 type MasterPW struct {
-	Config             *MPConfig
+	Config             *config.MPConfig
 	masterPasswordSeed string
 	passwordType       string
 	fullname           string
@@ -52,7 +53,7 @@ type MasterPW struct {
 // NewMasterPassword returns a new empty MasterPW struct
 func NewMasterPassword() *MasterPW {
 	return &MasterPW{
-		Config: NewMPConfig(),
+		Config: config.NewMPConfig(),
 	}
 }
 
@@ -111,7 +112,7 @@ func (mpw *MasterPW) MergeConfig() error {
 }
 
 // MergeConfigEX will transfer and validate data from given MPConfig to MasterPW for any nil values.
-func (mpw *MasterPW) MergeConfigEX(c *MPConfig) error {
+func (mpw *MasterPW) MergeConfigEX(c *config.MPConfig) error {
 	if mpw.masterPasswordSeed == "" {
 		mpw.masterPasswordSeed = c.MasterPasswordSeed
 	}
