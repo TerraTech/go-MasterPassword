@@ -34,10 +34,6 @@ var mpwseeds = []string{
 	"danceLikeNoOneIsLooking",
 }
 
-type mpw struct {
-	*crypto.MasterPW
-}
-
 type testVector struct {
 	ms     string
 	c      uint32
@@ -52,17 +48,22 @@ var d = struct {
 	"user", "password", "example.com",
 }
 
-func newMpw(tv testVector) *mpw {
-	return &mpw{
-		&crypto.MasterPW{
-			MasterPasswordSeed: tv.ms,
-			Counter:            tv.c,
-			PasswordType:       tv.pt,
-			Fullname:           d.u,
-			Password:           d.pw,
-			Site:               d.s,
-		},
+func newMpw(tv testVector) (*crypto.MasterPW, error) {
+	mpw := &crypto.MasterPW{}
+	c := &crypto.MPConfig{
+		MasterPasswordSeed: tv.ms,
+		Counter:            tv.c,
+		PasswordType:       tv.pt,
+		Fullname:           d.u,
+		Password:           d.pw,
+		Site:               d.s,
 	}
+
+	if err := mpw.MergeConfigEX(c); err != nil {
+		return nil, err
+	}
+
+	return mpw, nil
 }
 
 func TestMasterPassword(t *testing.T) {
@@ -95,7 +96,8 @@ func TestMasterPassword(t *testing.T) {
 
 	// Test method call
 	for _, tv := range expectations {
-		mpw := newMpw(tv)
+		mpw, err := newMpw(tv)
+		assert.NoError(t, err)
 		pw, err := mpw.MasterPassword()
 		assert.NoError(t, err)
 		assert.Equal(t, tv.expect, pw)
@@ -141,7 +143,8 @@ func TestMasterPasswordSeeds(t *testing.T) {
 
 	for seedn, tvs := range expectations {
 		for _, tv := range tvs {
-			mpw := newMpw(tv)
+			mpw, err := newMpw(tv)
+			assert.NoError(t, err)
 			mpw.MasterPasswordSeed = mpwseeds[seedn+1]
 			pw, err := mpw.MasterPassword()
 			assert.NoError(t, err)
