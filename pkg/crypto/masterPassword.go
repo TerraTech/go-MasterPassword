@@ -103,6 +103,66 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 	return buffer.String(), nil
 }
 
+// MergeConfig will transfer and validate data from Config to MasterPW for any nil values.
+func (mpw *MasterPW) MergeConfig() error {
+	return mpw.MergeConfigEX(mpw.Config)
+}
+
+// MergeConfigEX will transfer and validate data from given MPConfig to MasterPW for any nil values.
+func (mpw *MasterPW) MergeConfigEX(c *MPConfig) error {
+	if mpw.masterPasswordSeed == "" {
+		mpw.masterPasswordSeed = c.MasterPasswordSeed
+	}
+	if mpw.passwordType == "" {
+		mpw.passwordType = c.PasswordType
+	}
+	if mpw.fullname == "" {
+		mpw.fullname = c.Fullname
+	}
+	if mpw.password == "" {
+		mpw.password = c.Password
+	}
+	if mpw.site == "" {
+		mpw.site = c.Site
+	}
+	if mpw.counter == 0 {
+		mpw.counter = c.Counter
+	}
+
+	return mpw.Validate()
+}
+
+// Validate ensures that MasterPW is ready for MasterPassword().
+//
+//   1) masterPasswordSeed
+//   2) passwordType
+//   3) fullname
+//   4) password
+//   5) site
+//   6) counter
+func (mpw *MasterPW) Validate() error {
+	if err := ValidateMasterPasswordSeed(mpw.masterPasswordSeed); err != nil {
+		return err
+	}
+	if err := ValidatePasswordType(mpw.passwordType); err != nil {
+		return err
+	}
+	if err := ValidateFullname(mpw.fullname); err != nil {
+		return err
+	}
+	if err := ValidatePassword(mpw.password); err != nil {
+		return err
+	}
+	if err := ValidateSite(mpw.site); err != nil {
+		return err
+	}
+	if err := ValidateCounter(mpw.counter); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
 //
 //   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
