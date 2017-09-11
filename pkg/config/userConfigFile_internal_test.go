@@ -18,12 +18,14 @@
 // LICENSE file.  Alternatively, see <http://www.gnu.org/licenses/>.
 //==============================================================================
 
-package config
+package config_test
 
 import (
 	"testing"
 
 	"futurequest.net/FQgolibs/FQtesting"
+	"github.com/TerraTech/go-MasterPassword/pkg/common"
+	"github.com/TerraTech/go-MasterPassword/pkg/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,7 +36,7 @@ func TestGcfn(t *testing.T) {
 
 	abort := make(chan struct{})
 	defer close(abort)
-	ch := Gcfn(DefaultConfigFilename, "TESTHOME", abort)
+	ch := config.Gcfn(config.DefaultConfigFilename, "TESTHOME", abort)
 	var i = 0
 	for cf := range ch {
 		if !assert.Equal(t, expected[i], cf) {
@@ -45,9 +47,9 @@ func TestGcfn(t *testing.T) {
 }
 
 func TestLoadConfig(t *testing.T) {
-	var c Config
+	var c *config.MPConfig = &config.MPConfig{}
 
-	expected := Config{
+	expected := &config.MPConfig{
 		MasterPasswordSeed: "overrideDefaultMPWseed",
 		Fullname:           "TestUser",
 		Password:           "liveLifeToTheEdge",
@@ -60,33 +62,32 @@ func TestLoadConfig(t *testing.T) {
 	ane(t, err)
 	assert.Equal(t, expected, c)
 
-	// MasterPasswordSeed is only overridden in first test
-	expected.MasterPasswordSeed = ""
-
 	// test 'Counter' and 'PasswordType' defaults when 'omitempty'
+	expected.MasterPasswordSeed = ""
 	expected.Counter = 1
 	expected.PasswordType = "long"
 
-	c = NewConfig()
+	c = config.NewMPConfig()
 	err = c.LoadConfig("../../files/gompw-omitempty.toml")
 	ane(t, err)
 	assert.Equal(t, expected, c)
 
 	// test against empty gompw.toml
-	expected = Config{
+	expected = &config.MPConfig{
+		MasterPasswordSeed: common.MasterPasswordSeed,
 		PasswordType: "long",
 		Counter:      1,
 	}
-	c = NewConfig()
+	c = config.NewMPConfig()
 	err = c.LoadConfig("../../files/gompw-empty.toml")
 	ane(t, err)
 	assert.Equal(t, expected, c)
 }
 
 func TestMerge(t *testing.T) {
-	var c Config
+	var c config.MPConfig
 
-	expected := Config{
+	expected := config.MPConfig{
 		Fullname:     "TestUser",
 		Password:     "liveLifeToTheEdge",
 		PasswordType: "long",
