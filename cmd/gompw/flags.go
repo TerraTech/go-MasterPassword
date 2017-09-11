@@ -29,7 +29,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/TerraTech/go-MasterPassword/pkg/common"
 	flag "github.com/spf13/pflag"
 )
 
@@ -183,7 +182,7 @@ func handleFlags(m *MPW) {
 		}
 
 	}
-	if err := common.ValidateSiteCounter(m.Counter); err != nil {
+	if err := ValidateCounter(m.Counter); err != nil {
 		log.Fatal(err.Error())
 	}
 }
