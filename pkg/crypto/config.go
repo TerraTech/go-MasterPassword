@@ -20,7 +20,9 @@
 
 package crypto
 
-// MasterPW contains all relevant items for MasterPassword to act upon.
+// MPConfig is the intermediate struct for toml.Unmarshal
+//
+// userConfig =unmarshal=> MPConfig =merge=> MasterPW
 type MPConfig struct {
 	MasterPasswordSeed string `toml:"masterPasswordSeed,omitempty"`
 	PasswordType       string `toml:"passwordType,omitempty"`
