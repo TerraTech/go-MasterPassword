@@ -74,24 +74,21 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 		return "", err
 	}
 
+	// munge the master password seed depending on password purpose
+	mpseed := mpw.masterPasswordSeed + mpw.purpose()
+
 	// DUMP mpw
 	if os.Getenv("MP_DUMP") != "" {
+		mpw.masterPasswordSeed = mpseed
 		fmt.Fprintf(os.Stderr, "\n== DUMP =======\n")
 		FQdebug.D(mpw)
 		fmt.Fprintf(os.Stderr, "===============\n\n")
 	}
 
 	templates := passwordTypeTemplates[mpw.passwordType]
-	if templates == nil {
-		return "", fmt.Errorf("cannot find password template %s", mpw.passwordType)
-	}
-
-	if err := ValidateCounter(mpw.counter); err != nil {
-		return "", err
-	}
 
 	var buffer bytes.Buffer
-	buffer.WriteString(mpw.masterPasswordSeed)
+	buffer.WriteString(mpseed)
 	binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.fullname)))
 	buffer.WriteString(mpw.fullname)
 
@@ -101,7 +98,7 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 		return "", fmt.Errorf("failed to generate password: %s", err)
 	}
 
-	buffer.Truncate(len(mpw.masterPasswordSeed))
+	buffer.Truncate(len(mpseed))
 	binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.site)))
 	buffer.WriteString(mpw.site)
 	binary.Write(&buffer, binary.BigEndian, mpw.counter)
