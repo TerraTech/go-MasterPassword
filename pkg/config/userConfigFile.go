@@ -31,12 +31,6 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
-const (
-	DefaultConfigFilename = "gompw.toml"
-	DefaultCounter        = 1
-	DefaultPasswordType   = "long"
-)
-
 type Config crypto.MasterPW
 
 func NewConfig() Config {

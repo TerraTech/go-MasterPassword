@@ -24,6 +24,12 @@ import (
 	"github.com/TerraTech/go-MasterPassword/pkg/common"
 )
 
+const (
+	DefaultConfigFilename = "gompw.toml"
+	DefaultCounter        = 1
+	DefaultPasswordType   = "long"
+)
+
 // MPConfig is the intermediate struct for toml.Unmarshal
 //
 // userConfig =unmarshal=> MPConfig =merge=> MasterPW
@@ -40,7 +46,7 @@ type MPConfig struct {
 func NewMPConfig() *MPConfig {
 	return &MPConfig{
 		MasterPasswordSeed: common.MasterPasswordSeed,
-		PasswordType:       "long",
-		Counter:            1,
+		PasswordType:       DefaultPasswordType,
+		Counter:            DefaultCounter,
 	}
 }
