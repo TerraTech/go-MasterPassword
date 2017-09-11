@@ -18,7 +18,7 @@
 // LICENSE file.  Alternatively, see <http://www.gnu.org/licenses/>.
 //==============================================================================
 
-package crypto
+package config
 
 // MPConfig is the intermediate struct for toml.Unmarshal
 //
