@@ -167,8 +167,6 @@ func (mpw *MasterPW) Validate() error {
 // MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
 //
 //   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
-//
-//   NOTE: mpwseed == "", will use the default Master Password Seed, do not change unless you have specific requirements
 func MasterPassword(mpwseed, passwordType, fullname, password, site string, counter uint32) (string, error) {
 	mpw := &MasterPW{
 		masterPasswordSeed: mpwseed,
