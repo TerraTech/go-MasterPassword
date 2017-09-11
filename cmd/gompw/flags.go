@@ -95,6 +95,11 @@ func handleFlags(m *MPW) {
 		fatal("-d and -f are mutually exclusive.")
 	}
 
+	// -I and -C are mutually exclusive
+	if flag.ShorthandLookup("I").Changed && flag.ShorthandLookup("C").Changed {
+		fatal("-I and -C are mutually exclusive.")
+	}
+
 	if !ignoreConfigFile {
 		err := config.LoadConfig(configFile)
 		if err != nil {
