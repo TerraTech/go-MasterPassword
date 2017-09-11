@@ -18,29 +18,8 @@
 // LICENSE file.  Alternatively, see <http://www.gnu.org/licenses/>.
 //==============================================================================
 
-package config
+package common
 
-import (
-	"github.com/TerraTech/go-MasterPassword/pkg/common"
-)
-
-// MPConfig is the intermediate struct for toml.Unmarshal
-//
-// userConfig =unmarshal=> MPConfig =merge=> MasterPW
-type MPConfig struct {
-	MasterPasswordSeed string `toml:"masterPasswordSeed,omitempty"`
-	PasswordType       string `toml:"passwordType,omitempty"`
-	Fullname           string `toml:"fullname,omitempty"`
-	Password           string `toml:"password,omitempty"`
-	Site               string `toml:"site,omitempty"`
-	Counter            uint32 `toml:"counter,omitempty"` // Counter >= 1
-}
-
-// NewMPConfig returns a new MPConfig with defaults set
-func NewMPConfig() *MPConfig {
-	return &MPConfig{
-		MasterPasswordSeed: common.MasterPasswordSeed,
-		PasswordType:       "long",
-		Counter:            1,
-	}
-}
+// MasterPasswordSeed is the default seed and allows it to be compatible with
+// http://masterpasswordapp.com/algorithm.html
+const MasterPasswordSeed = "com.lyndir.masterpassword"

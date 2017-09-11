@@ -27,6 +27,7 @@ import (
 	"encoding/binary"
 	"fmt"
 
+	"github.com/TerraTech/go-MasterPassword/pkg/common"
 	"golang.org/x/crypto/scrypt"
 )
 
@@ -35,7 +36,7 @@ const MpwSeries = "2.6"
 
 // MasterPasswordSeed is the default seed and allows it to be compatible with
 // http://masterpasswordapp.com/algorithm.html
-const MasterPasswordSeed = "com.lyndir.masterpassword"
+const MasterPasswordSeed = common.MasterPasswordSeed
 
 // MasterPW contains all relevant items for MasterPassword to act upon.
 type MasterPW struct {
