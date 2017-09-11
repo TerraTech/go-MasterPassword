@@ -36,9 +36,13 @@ func handleFlags(m *MPW) {
 	var config Config
 	var configFile string
 	var err error
+	var flagListPasswordTypes bool
+	var flagShowVersion bool
 	var ignoreConfigFile bool
 	var pwBytes []byte
 	var pwInput io.Reader
+
+	default_pwType := m.PasswordType // stuff away default PasswordType
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage: %s [flags] site\n", PROG)
@@ -56,10 +60,6 @@ func handleFlags(m *MPW) {
 		fmt.Println("  2) $HOME/.gompw.toml")
 		fmt.Println("  3) /etc/gompw.toml")
 	}
-
-	default_pwType := m.PasswordType // stuff away default PasswordType
-	var flagShowVersion bool
-	var flagListPasswordTypes bool
 
 	// "-v" reserved for '--verbose' if implemented
 	flag.BoolVarP(&flagListPasswordTypes, "listPasswordTypes", "l", false, "List valid Password Types")
