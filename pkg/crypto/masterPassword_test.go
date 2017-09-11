@@ -145,7 +145,8 @@ func TestMasterPasswordSeeds(t *testing.T) {
 		for _, tv := range tvs {
 			mpw, err := newMpw(tv)
 			assert.NoError(t, err)
-			mpw.MasterPasswordSeed = mpwseeds[seedn+1]
+			err = mpw.SetMasterPasswordSeed(mpwseeds[seedn+1])
+			assert.NoError(t, err)
 			pw, err := mpw.MasterPassword()
 			assert.NoError(t, err)
 			assert.Equal(t, tv.expect, pw)
