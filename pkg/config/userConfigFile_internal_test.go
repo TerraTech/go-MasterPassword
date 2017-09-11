@@ -18,7 +18,7 @@
 // LICENSE file.  Alternatively, see <http://www.gnu.org/licenses/>.
 //==============================================================================
 
-package main
+package config
 
 import (
 	"testing"
