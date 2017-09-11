@@ -52,6 +52,10 @@ func (mpw *MasterPW) SetPassword(password string) (err error) {
 	return
 }
 
+/*
+ * SetPasswordPurpose(): passwordPurpose.go
+ */
+
 // SetPasswordType is a setter for MasterPW.passwordType
 func (mpw *MasterPW) SetPasswordType(pwtype string) (err error) {
 	if err = ValidatePasswordType(pwtype); err == nil {

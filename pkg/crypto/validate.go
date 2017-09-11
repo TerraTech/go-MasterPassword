@@ -101,6 +101,10 @@ func ValidatePassword(password string) error {
 	return nil
 }
 
+/*
+ * ValidatePasswordPurpose(): passwordPurpose.go
+ */
+
 // ValidatePasswordType verifies that passwordType is not empty and a valid type
 func ValidatePasswordType(passwordType string) error {
 	if passwordType == "" {
