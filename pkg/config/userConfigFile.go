@@ -27,17 +27,8 @@ import (
 	"path/filepath"
 
 	"futurequest.net/FQgolibs/FQfile"
-	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
 	"github.com/pelletier/go-toml"
 )
-
-type Config crypto.MasterPW
-
-func NewConfig() Config {
-	var c Config
-
-	return c
-}
 
 // generate configfile names
 // Precedence:
@@ -71,7 +62,7 @@ func Gcfn(f, home string, abort <-chan struct{}) <-chan string {
 	return ch
 }
 
-func (c *Config) LoadConfig(configFile string) error {
+func (c *MPConfig) LoadConfig(configFile string) error {
 	var t []byte
 	var err error
 
