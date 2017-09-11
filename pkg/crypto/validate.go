@@ -34,6 +34,37 @@ var (
 	ErrSiteEmpty               = errors.New("Site name must be set")
 )
 
+// Validate ensures that MasterPW is ready for MasterPassword().
+//
+//   1) masterPasswordSeed
+//   2) passwordType
+//   3) fullname
+//   4) password
+//   5) site
+//   6) counter
+func (mpw *MasterPW) Validate() error {
+	if err := ValidateMasterPasswordSeed(mpw.masterPasswordSeed); err != nil {
+		return err
+	}
+	if err := ValidatePasswordType(mpw.passwordType); err != nil {
+		return err
+	}
+	if err := ValidateFullname(mpw.fullname); err != nil {
+		return err
+	}
+	if err := ValidatePassword(mpw.password); err != nil {
+		return err
+	}
+	if err := ValidateSite(mpw.site); err != nil {
+		return err
+	}
+	if err := ValidateCounter(mpw.counter); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // ValidateCounter validates that the site counter value is >= 1
 func ValidateCounter(counter uint32) error {
 	if counter < 1 {
