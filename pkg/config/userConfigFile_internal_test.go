@@ -23,13 +23,10 @@ package config_test
 import (
 	"testing"
 
-	"futurequest.net/FQgolibs/FQtesting"
 	"github.com/TerraTech/go-MasterPassword/pkg/common"
 	"github.com/TerraTech/go-MasterPassword/pkg/config"
 	"github.com/stretchr/testify/assert"
 )
-
-var ane = FQtesting.ANE
 
 func TestGcfn(t *testing.T) {
 	expected := []string{"gompw.toml", "TESTHOME/.gompw.toml", "/etc/gompw.toml"}
@@ -59,7 +56,7 @@ func TestLoadConfig(t *testing.T) {
 	}
 
 	err := c.LoadConfig("../../files/gompw.toml")
-	ane(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, c)
 
 	// test 'Counter' and 'PasswordType' defaults when 'omitempty'
@@ -69,7 +66,7 @@ func TestLoadConfig(t *testing.T) {
 
 	c = config.NewMPConfig()
 	err = c.LoadConfig("../../files/gompw-omitempty.toml")
-	ane(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, c)
 
 	// test against empty gompw.toml
@@ -80,7 +77,7 @@ func TestLoadConfig(t *testing.T) {
 	}
 	c = config.NewMPConfig()
 	err = c.LoadConfig("../../files/gompw-empty.toml")
-	ane(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, c)
 }
 
@@ -95,6 +92,6 @@ func TestMerge(t *testing.T) {
 	}
 
 	err := c.LoadConfig("../../files/gompw-merge.toml")
-	ane(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, c)
 }
