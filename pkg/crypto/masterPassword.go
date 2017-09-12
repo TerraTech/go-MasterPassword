@@ -39,7 +39,7 @@ const MpwSeries = "2.6"
 
 // MasterPasswordSeed is the default seed and allows it to be compatible with
 // http://masterpasswordapp.com/algorithm.html
-const MasterPasswordSeed = common.MasterPasswordSeed
+const DefaultMasterPasswordSeed = common.DefaultMasterPasswordSeed
 
 // MasterPW contains all relevant items for MasterPassword to act upon.
 type MasterPW struct {
@@ -65,7 +65,7 @@ func NewMasterPassword() *MasterPW {
 func (mpw *MasterPW) MasterPassword() (string, error) {
 	// Fixup MasterPasswordSeed if ""
 	if mpw.masterPasswordSeed == "" && mpw.Config.MasterPasswordSeed == "" {
-		mpw.Config.MasterPasswordSeed = MasterPasswordSeed
+		mpw.Config.MasterPasswordSeed = DefaultMasterPasswordSeed
 	}
 
 	// merge (and validate) Config ==> MasterPW

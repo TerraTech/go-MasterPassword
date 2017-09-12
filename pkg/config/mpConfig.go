@@ -45,7 +45,7 @@ type MPConfig struct {
 // NewMPConfig returns a new MPConfig with defaults set
 func NewMPConfig() *MPConfig {
 	return &MPConfig{
-		MasterPasswordSeed: common.MasterPasswordSeed,
+		MasterPasswordSeed: common.DefaultMasterPasswordSeed,
 		PasswordType:       DefaultPasswordType,
 		Counter:            DefaultCounter,
 	}

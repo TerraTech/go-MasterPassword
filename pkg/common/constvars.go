@@ -22,4 +22,4 @@ package common
 
 // MasterPasswordSeed is the default seed and allows it to be compatible with
 // http://masterpasswordapp.com/algorithm.html
-const MasterPasswordSeed = "com.lyndir.masterpassword"
+const DefaultMasterPasswordSeed = "com.lyndir.masterpassword"
