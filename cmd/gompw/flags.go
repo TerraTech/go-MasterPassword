@@ -29,7 +29,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
+	"github.com/TerraTech/go-MasterPassword/pkg/common"
 
 	flag "github.com/spf13/pflag"
 )
@@ -68,6 +68,27 @@ func handleFlags(mpw *MPW) {
 		fmt.Println("  3) /etc/gompw.toml")
 	}
 
+	// setup our defaults
+	flagDefaults := func(_default string, overrides ...string) string {
+		for _, override := range overrides {
+			if override != "" {
+				return override
+			}
+		}
+		return _default
+	}
+	flagDefaultCounter := func(_default uint32, override string) uint32 {
+		if override != "" {
+			mpsc, err := strconv.Atoi(override)
+			if err != nil {
+				log.Print("Invalid value specified for MP_SITECOUNTER")
+				log.Fatal(err.Error())
+			}
+			return uint32(mpsc)
+		}
+		return _default
+	}
+
 	// "-v" reserved for '--verbose' if implemented
 	flag.BoolVarP(&flagListPasswordTypes, "listPasswordTypes", "l", false, "List valid Password Types")
 	flag.BoolVarP(&flagShowVersion, "version", "V", false, "Show version")
@@ -75,10 +96,10 @@ func handleFlags(mpw *MPW) {
 	flag.BoolVar(&mpw.ssp, "ssp", false, "Shoulder Surfing Prevention by not echoing any terminal input")
 	flag.StringVarP(&configFile, "config", "C", "", "User configuration file override")
 	flag.StringVarP(&mpw.Config.Fullname, "fullname", "u", os.Getenv("MP_FULLNAME"), "Fullname")
-	flag.StringVarP(&mpw.Config.MasterPasswordSeed, "mpseed", "S", os.Getenv("MP_SEED"), "Override the Master Password Seed")
-	flag.StringVarP(&mpw.Config.PasswordType, "pwtype", "t", os.Getenv("MP_PWTYPE"), flagHelp("t"))
+	flag.StringVarP(&mpw.Config.MasterPasswordSeed, "mpseed", "S", flagDefaults(common.DefaultMasterPasswordSeed, os.Getenv("MP_SEED")), "Override the Master Password Seed")
+	flag.StringVarP(&mpw.Config.PasswordType, "pwtype", "t", flagDefaults(common.DefaultPasswordType, os.Getenv("MP_PWTYPE")), flagHelp("t"))
 	flag.StringVarP(&mpw.pwFile, "file", "f", "", "Read user's master password from given filename")
-	flag.Uint32VarP(&mpw.Config.Counter, "counter", "c", 1, "Site password counter value")
+	flag.Uint32VarP(&mpw.Config.Counter, "counter", "c", flagDefaultCounter(common.DefaultCounter, os.Getenv("MP_SITECOUNTER")), "Site password counter value")
 	flag.UintVarP(&mpw.fd, "fd", "d", 0, "Read user's master password from given file descriptor")
 
 	flag.Parse()
@@ -172,29 +193,9 @@ func handleFlags(mpw *MPW) {
 	}
 
 	// handle site
-	var site string
-	if site = flag.Arg(0); site != "" {
-	} else if site = os.Getenv("MP_SITE"); site != "" {
-	} else {
+	site := flagDefaults("", flag.Arg(0), os.Getenv("MP_SITE"))
+	if site == "" {
 		site = getResponse("Site name: ", "Site must be specified")
 	}
 	mpw.Config.Site = site
-
-	// handle site counter
-	if !flag.ShorthandLookup("c").Changed {
-		// Check to see if defined via envariable
-		siteCounter := os.Getenv("MP_SITECOUNTER")
-		if siteCounter != "" {
-			mc, err := strconv.Atoi(siteCounter)
-			if err != nil {
-				log.Print("Invalid value specified for MP_SITECOUNTER")
-				log.Fatal(err.Error())
-			}
-			mpw.Config.Counter = uint32(mc)
-		}
-
-	}
-	if err := crypto.ValidateCounter(mpw.Config.Counter); err != nil {
-		log.Fatal(err.Error())
-	}
 }
