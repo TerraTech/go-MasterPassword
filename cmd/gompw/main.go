@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	PROG string = path.Base(os.Args[0])
+	PROG      string = path.Base(os.Args[0])
 	VERSION   string // Filled via Makefile
 	BUILD     string = FQversion.GetBUILD()
 	BUILDHOST string // Filled via Makefile

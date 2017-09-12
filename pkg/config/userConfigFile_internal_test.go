@@ -75,8 +75,8 @@ func TestLoadConfig(t *testing.T) {
 	// test against empty gompw.toml
 	expected = &config.MPConfig{
 		MasterPasswordSeed: common.MasterPasswordSeed,
-		PasswordType: "long",
-		Counter:      1,
+		PasswordType:       "long",
+		Counter:            1,
 	}
 	c = config.NewMPConfig()
 	err = c.LoadConfig("../../files/gompw-empty.toml")
