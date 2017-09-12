@@ -25,6 +25,7 @@ import (
 	"path"
 
 	"futurequest.net/FQgolibs/FQversion"
+	"github.com/TerraTech/go-MasterPassword/pkg/config"
 	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
 )
 
@@ -37,6 +38,7 @@ var (
 
 type MPW struct {
 	*crypto.MasterPW
+	cu     *config.MPConfig // (MP)Config User, loaded from .toml files
 	fd     uint
 	pwFile string
 	ssp    bool
@@ -45,6 +47,7 @@ type MPW struct {
 func main() {
 	mpw := &MPW{
 		MasterPW: crypto.NewMasterPassword(),
+		cu:       &config.MPConfig{},
 	}
 
 	handleFlags(mpw)

@@ -26,7 +26,9 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"fmt"
+	"os"
 
+	"futurequest.net/FQgolibs/FQdebug"
 	"github.com/TerraTech/go-MasterPassword/pkg/common"
 	"github.com/TerraTech/go-MasterPassword/pkg/config"
 	"golang.org/x/crypto/scrypt"
@@ -61,9 +63,21 @@ func NewMasterPassword() *MasterPW {
 //
 //   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
 func (mpw *MasterPW) MasterPassword() (string, error) {
+	// Fixup MasterPasswordSeed if ""
+	if mpw.Config.MasterPasswordSeed == "" {
+		mpw.Config.MasterPasswordSeed = MasterPasswordSeed
+	}
+
 	// merge (and validate) Config ==> MasterPW
 	if err := mpw.MergeConfig(); err != nil {
 		return "", err
+	}
+
+	// DUMP mpw
+	if os.Getenv("MP_DUMP") != "" {
+		fmt.Fprintf(os.Stderr, "\n== DUMP =======\n")
+		FQdebug.D(mpw)
+		fmt.Fprintf(os.Stderr, "===============\n\n")
 	}
 
 	templates := passwordTypeTemplates[mpw.passwordType]
