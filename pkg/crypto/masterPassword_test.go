@@ -23,6 +23,7 @@ package crypto_test
 import (
 	"testing"
 
+	"github.com/TerraTech/go-MasterPassword/pkg/config"
 	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
 	"github.com/stretchr/testify/assert"
 )
@@ -49,8 +50,8 @@ var d = struct {
 }
 
 func newMpw(tv testVector) (*crypto.MasterPW, error) {
-	mpw := &crypto.MasterPW{}
-	c := &crypto.MPConfig{
+	mpw := &crypto.MasterPW{Config: &config.MPConfig{}}
+	c := &config.MPConfig{
 		MasterPasswordSeed: tv.ms,
 		Counter:            tv.c,
 		PasswordType:       tv.pt,
@@ -65,7 +66,6 @@ func newMpw(tv testVector) (*crypto.MasterPW, error) {
 
 	return mpw, nil
 }
-
 func TestMasterPassword(t *testing.T) {
 	expectations := []testVector{
 		{mpwseeds[0], 1, "long", "ZedaFaxcZaso9*"},

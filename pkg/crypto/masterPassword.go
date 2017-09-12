@@ -64,7 +64,7 @@ func NewMasterPassword() *MasterPW {
 //   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
 func (mpw *MasterPW) MasterPassword() (string, error) {
 	// Fixup MasterPasswordSeed if ""
-	if mpw.Config.MasterPasswordSeed == "" {
+	if mpw.masterPasswordSeed == "" && mpw.Config.MasterPasswordSeed == "" {
 		mpw.Config.MasterPasswordSeed = MasterPasswordSeed
 	}
 
@@ -125,6 +125,7 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 //   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
 func MasterPassword(mpwseed, passwordType, fullname, password, site string, counter uint32) (string, error) {
 	mpw := &MasterPW{
+		Config:             &config.MPConfig{},
 		masterPasswordSeed: mpwseed,
 		passwordType:       passwordType,
 		fullname:           fullname,
