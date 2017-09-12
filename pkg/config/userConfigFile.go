@@ -27,7 +27,12 @@ import (
 	"path/filepath"
 
 	"futurequest.net/FQgolibs/FQfile"
+	"github.com/TerraTech/go-MasterPassword/pkg/common"
 	"github.com/pelletier/go-toml"
+)
+
+const (
+	DefaultConfigFilename = common.DefaultConfigFilename
 )
 
 // generate configfile names

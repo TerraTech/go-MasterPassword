@@ -25,9 +25,8 @@ import (
 )
 
 const (
-	DefaultConfigFilename = "gompw.toml"
-	DefaultCounter        = 1
-	DefaultPasswordType   = "long"
+	DefaultCounter      = common.DefaultCounter
+	DefaultPasswordType = common.DefaultPasswordType
 )
 
 // MPConfig is the intermediate struct for toml.Unmarshal

@@ -22,4 +22,12 @@ package common
 
 // MasterPasswordSeed is the default seed and allows it to be compatible with
 // http://masterpasswordapp.com/algorithm.html
-const DefaultMasterPasswordSeed = "com.lyndir.masterpassword"
+const (
+	// config
+	DefaultConfigFilename = "gompw.toml"
+	DefaultCounter        = 1
+	DefaultPasswordType   = "long"
+
+	// crypto
+	DefaultMasterPasswordSeed = "com.lyndir.masterpassword"
+)

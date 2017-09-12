@@ -33,7 +33,7 @@ func TestGcfn(t *testing.T) {
 
 	abort := make(chan struct{})
 	defer close(abort)
-	ch := config.Gcfn(config.DefaultConfigFilename, "TESTHOME", abort)
+	ch := config.Gcfn(common.DefaultConfigFilename, "TESTHOME", abort)
 	var i = 0
 	for cf := range ch {
 		if !assert.Equal(t, expected[i], cf) {
