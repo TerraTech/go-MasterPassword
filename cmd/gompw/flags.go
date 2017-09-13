@@ -40,7 +40,6 @@ func handleFlags(mpw *MPW) {
 	var flagListPasswordTypes bool
 	var flagShowVersion bool
 	var ignoreConfigFile bool
-	var passwordPurpose string
 	var pwBytes []byte
 	var pwInput io.Reader
 
@@ -58,6 +57,7 @@ func handleFlags(mpw *MPW) {
 		//             MP_DEBUG
 		//             MP_DUMP
 		fmt.Println("  MP_FULLNAME     | The full name of the user (see -u)")
+		fmt.Println("  MP_PWPURPOSE    | The password purpose (see -p)")
 		fmt.Println("  MP_PWTYPE       | The password type (see -t)")
 		fmt.Println("  MP_SEED         | The master password seed (see -S)")
 		fmt.Println("  MP_SITE         | The site for generated password")
@@ -98,7 +98,7 @@ func handleFlags(mpw *MPW) {
 	flag.StringVarP(&configFile, "config", "C", "", "User configuration file override")
 	flag.StringVarP(&mpw.Config.Fullname, "fullname", "u", os.Getenv("MP_FULLNAME"), "Fullname")
 	flag.StringVarP(&mpw.Config.MasterPasswordSeed, "mpseed", "S", flagDefaults(common.DefaultMasterPasswordSeed, os.Getenv("MP_SEED")), "Override the Master Password Seed")
-	flag.StringVarP(&passwordPurpose, "purpose", "p", "", flagHelp("p"))
+	flag.StringVarP(&mpw.Config.PasswordPurpose, "purpose", "p", flagDefaults(common.DefaultPasswordPurpose, os.Getenv("MP_PWPURPOSE")), flagHelp("p"))
 	flag.StringVarP(&mpw.Config.PasswordType, "pwtype", "t", flagDefaults(common.DefaultPasswordType, os.Getenv("MP_PWTYPE")), flagHelp("t"))
 	flag.StringVarP(&mpw.pwFile, "file", "f", "", "Read user's master password from given filename")
 	flag.Uint32VarP(&mpw.Config.Counter, "counter", "c", flagDefaultCounter(common.DefaultCounter, os.Getenv("MP_SITECOUNTER")), "Site password counter value")
