@@ -23,13 +23,14 @@ package crypto_test
 import (
 	"testing"
 
+	"github.com/TerraTech/go-MasterPassword/pkg/common"
 	"github.com/TerraTech/go-MasterPassword/pkg/config"
 	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
 	"github.com/stretchr/testify/assert"
 )
 
 var mpwseeds = []string{
-	crypto.MasterPasswordSeed,
+	common.DefaultMasterPasswordSeed,
 	"overrideDefaultMPWseed",
 	"liveLifeBeyondAllYourTomorrrows",
 	"danceLikeNoOneIsLooking",
