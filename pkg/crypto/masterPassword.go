@@ -126,12 +126,13 @@ func MasterPassword(mpwseed, passwordType, passwordPurpose, fullname, password, 
 		Config:             &config.MPConfig{},
 		masterPasswordSeed: mpwseed,
 		passwordType:       passwordType,
-		passwordPurpose:    passwordPurpose,
 		fullname:           fullname,
 		password:           password,
 		site:               site,
 		counter:            counter,
 	}
+	// needs to be set via method for validation
+	mpw.SetPasswordPurpose(passwordPurpose)
 
 	return mpw.MasterPassword()
 }
