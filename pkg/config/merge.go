@@ -37,6 +37,7 @@ var (
 			"PasswordType":       struct{}{},
 			"Fullname":           struct{}{},
 			"Password":           struct{}{},
+			"PasswordPurpose":    struct{}{},
 			"Site":               struct{}{},
 			"Counter":            struct{}{},
 		}
@@ -76,6 +77,9 @@ func (mpc *MPConfig) Merge(c *MPConfig) {
 	}
 	if mpc.Password == "" {
 		mpc.Password = c.Password
+	}
+	if mpc.PasswordPurpose == "" {
+		mpc.PasswordPurpose = c.PasswordPurpose
 	}
 	if mpc.Site == "" {
 		mpc.Site = c.Site
