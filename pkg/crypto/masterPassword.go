@@ -26,145 +26,84 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"fmt"
-	"sort"
+	"os"
 
+	"futurequest.net/FQgolibs/FQdebug"
 	"github.com/TerraTech/go-MasterPassword/pkg/common"
+	"github.com/TerraTech/go-MasterPassword/pkg/config"
 	"golang.org/x/crypto/scrypt"
 )
 
 // MpwSeries denotes the mpw cli client version compatibility.
 const MpwSeries = "2.6"
 
-// MasterPasswordTypes is for listing the current supported password types.
-//
-//   Default: long
-const MasterPasswordTypes = "basic, long, maximum, medium, name, phrase, pin, short"
-
 // MasterPasswordSeed is the default seed and allows it to be compatible with
 // http://masterpasswordapp.com/algorithm.html
-const MasterPasswordSeed = "com.lyndir.masterpassword"
+const DefaultMasterPasswordSeed = common.DefaultMasterPasswordSeed
 
 // MasterPW contains all relevant items for MasterPassword to act upon.
 type MasterPW struct {
-	MasterPasswordSeed string `toml:"masterPasswordSeed,omitempty"`
-	PasswordType       string `toml:"passwordType,omitempty"`
-	Fullname           string `toml:"fullname,omitempty"`
-	Password           string `toml:"password,omitempty"`
-	Site               string `toml:"site,omitempty"`
-	Counter            uint32 `toml:"counter,omitempty"` // Counter >= 1
+	Config             *config.MPConfig
+	masterPasswordSeed string
+	passwordType       string
+	fullname           string
+	password           string
+	site               string
+	counter            uint32
 }
 
-func getPTT() map[string][][]byte {
-	ptt := map[string][][]byte{
-	"basic": {[]byte("aaanaaan"), []byte("aannaaan"), []byte("aaannaaa")},
-	"long": {[]byte("CvcvnoCvcvCvcv"), []byte("CvcvCvcvnoCvcv"), []byte("CvcvCvcvCvcvno"), []byte("CvccnoCvcvCvcv"), []byte("CvccCvcvnoCvcv"),
-		[]byte("CvccCvcvCvcvno"), []byte("CvcvnoCvccCvcv"), []byte("CvcvCvccnoCvcv"), []byte("CvcvCvccCvcvno"), []byte("CvcvnoCvcvCvcc"),
-		[]byte("CvcvCvcvnoCvcc"), []byte("CvcvCvcvCvccno"), []byte("CvccnoCvccCvcv"), []byte("CvccCvccnoCvcv"), []byte("CvccCvccCvcvno"),
-		[]byte("CvcvnoCvccCvcc"), []byte("CvcvCvccnoCvcc"), []byte("CvcvCvccCvccno"), []byte("CvccnoCvcvCvcc"), []byte("CvccCvcvnoCvcc"),
-		[]byte("CvccCvcvCvccno")},
-	"maximum": {[]byte("anoxxxxxxxxxxxxxxxxx"), []byte("axxxxxxxxxxxxxxxxxno")},
-	"medium":  {[]byte("CvcnoCvc"), []byte("CvcCvcno")},
-	"name":    {[]byte("cvccvcvcv")},
-	"phrase":  {[]byte("cvcc cvc cvccvcv cvc"), []byte("cvc cvccvcvcv cvcv"), []byte("cv cvccv cvc cvcvccv")},
-	"pin":     {[]byte("nnnn")},
-	"short":   {[]byte("Cvcn")},
-	}
-
-	// add shortcodes
-	ptt["b"] = ptt["basic"]
-	ptt["l"] = ptt["long"]
-	ptt["x"] = ptt["maximum"]
-	ptt["m"] = ptt["medium"]
-	ptt["n"] = ptt["name"]
-	ptt["p"] = ptt["phrase"]
-	ptt["i"] = ptt["pin"]
-	ptt["s"] = ptt["short"]
-
-	return ptt
-}
-var passwordTypeTemplates = getPTT()
-
-var template_characters = map[byte]string{
-	'V': "AEIOU",
-	'C': "BCDFGHJKLMNPQRSTVWXYZ",
-	'v': "aeiou",
-	'c': "bcdfghjklmnpqrstvwxyz",
-	'A': "AEIOUBCDFGHJKLMNPQRSTVWXYZ",
-	'a': "AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz",
-	'n': "0123456789",
-	'o': "@&%?,=[]_:-+*$#!'^~;()/.",
-	'x': "AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz0123456789!@#$%^&*()",
-	' ': " ",
-}
-
-// NewMasterPassword returns a new empty MasterPW struct with counter==1 and pwtype=="long"
+// NewMasterPassword returns a new empty MasterPW struct
 func NewMasterPassword() *MasterPW {
 	return &MasterPW{
-		Counter:      1,
-		PasswordType: "long",
+		Config: config.NewMPConfig(),
 	}
 }
 
 // MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
 //
 //   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
-func (m *MasterPW) MasterPassword() (string, error) {
-	return MasterPassword(m.MasterPasswordSeed, m.PasswordType, m.Fullname, m.Password, m.Site, m.Counter)
-}
-
-// GetPasswordTypes returns a sorted list of valid password types
-func (m *MasterPW) GetPasswordTypes() []string {
-	keys := make([]string, len(passwordTypeTemplates))
-	i := 0
-	for k, _ := range passwordTypeTemplates {
-		keys[i] = k
-		i++
+func (mpw *MasterPW) MasterPassword() (string, error) {
+	// Fixup MasterPasswordSeed if ""
+	if mpw.masterPasswordSeed == "" && mpw.Config.MasterPasswordSeed == "" {
+		mpw.Config.MasterPasswordSeed = DefaultMasterPasswordSeed
 	}
 
-	sort.Strings(keys)
-
-	return keys
-}
-
-func (m *MasterPW) IsValidPasswordType(passwordType string) bool {
-	_, exists := passwordTypeTemplates[passwordType]
-	return exists
-}
-
-// MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
-//
-//   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
-//
-//   NOTE: mpwseed == "", will use the default Master Password Seed, do not change unless you have specific requirements
-func MasterPassword(mpwseed, passwordType, user, password, site string, counter uint32) (string, error) {
-	if mpwseed == "" {
-		mpwseed = MasterPasswordSeed
+	// merge (and validate) Config ==> MasterPW
+	if err := mpw.MergeConfig(); err != nil {
+		return "", err
 	}
 
-	templates := passwordTypeTemplates[passwordType]
+	// DUMP mpw
+	if os.Getenv("MP_DUMP") != "" {
+		fmt.Fprintf(os.Stderr, "\n== DUMP =======\n")
+		FQdebug.D(mpw)
+		fmt.Fprintf(os.Stderr, "===============\n\n")
+	}
+
+	templates := passwordTypeTemplates[mpw.passwordType]
 	if templates == nil {
-		return "", fmt.Errorf("cannot find password template %s", passwordType)
+		return "", fmt.Errorf("cannot find password template %s", mpw.passwordType)
 	}
 
-	if err := common.ValidateSiteCounter(counter); err != nil {
+	if err := ValidateCounter(mpw.counter); err != nil {
 		return "", err
 	}
 
 	var buffer bytes.Buffer
-	buffer.WriteString(mpwseed)
-	binary.Write(&buffer, binary.BigEndian, uint32(len(user)))
-	buffer.WriteString(user)
+	buffer.WriteString(mpw.masterPasswordSeed)
+	binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.fullname)))
+	buffer.WriteString(mpw.fullname)
 
 	salt := buffer.Bytes()
-	key, err := scrypt.Key([]byte(password), salt, 32768, 8, 2, 64)
+	key, err := scrypt.Key([]byte(mpw.password), salt, 32768, 8, 2, 64)
 	if err != nil {
-		return "", fmt.Errorf("failed to derive password: %s", err)
+		return "", fmt.Errorf("failed to generate password: %s", err)
 	}
 
-	buffer.Truncate(len(mpwseed))
-	binary.Write(&buffer, binary.BigEndian, uint32(len(site)))
-	buffer.WriteString(site)
-	binary.Write(&buffer, binary.BigEndian, counter)
+	buffer.Truncate(len(mpw.masterPasswordSeed))
+	binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.site)))
+	buffer.WriteString(mpw.site)
+	binary.Write(&buffer, binary.BigEndian, mpw.counter)
 
 	var hmacv = hmac.New(sha256.New, key)
 	hmacv.Write(buffer.Bytes())
@@ -173,10 +112,27 @@ func MasterPassword(mpwseed, passwordType, user, password, site string, counter 
 
 	buffer.Truncate(0)
 	for i, element := range temp {
-		pass_chars := template_characters[element]
-		pass_char := pass_chars[int(seed[i+1])%len(pass_chars)]
-		buffer.WriteByte(pass_char)
+		passChars := templateCharacters[element]
+		passChar := passChars[int(seed[i+1])%len(passChars)]
+		buffer.WriteByte(passChar)
 	}
 
 	return buffer.String(), nil
+}
+
+// MasterPassword returns a derived password according to: http://masterpasswordapp.com/algorithm.html
+//
+//   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
+func MasterPassword(mpwseed, passwordType, fullname, password, site string, counter uint32) (string, error) {
+	mpw := &MasterPW{
+		Config:             &config.MPConfig{},
+		masterPasswordSeed: mpwseed,
+		passwordType:       passwordType,
+		fullname:           fullname,
+		password:           password,
+		site:               site,
+		counter:            counter,
+	}
+
+	return mpw.MasterPassword()
 }

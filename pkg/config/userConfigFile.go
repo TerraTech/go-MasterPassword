@@ -18,7 +18,7 @@
 // LICENSE file.  Alternatively, see <http://www.gnu.org/licenses/>.
 //==============================================================================
 
-package main
+package config
 
 import (
 	"fmt"
@@ -27,23 +27,13 @@ import (
 	"path/filepath"
 
 	"futurequest.net/FQgolibs/FQfile"
-	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
+	"github.com/TerraTech/go-MasterPassword/pkg/common"
 	"github.com/pelletier/go-toml"
 )
 
 const (
-	DefaultConfigFilename = "gompw.toml"
-	DefaultCounter        = 1
-	DefaultPasswordType   = "long"
+	DefaultConfigFilename = common.DefaultConfigFilename
 )
-
-type Config crypto.MasterPW
-
-func NewConfig() Config {
-	var c Config
-
-	return c
-}
 
 // generate configfile names
 // Precedence:
@@ -77,7 +67,7 @@ func Gcfn(f, home string, abort <-chan struct{}) <-chan string {
 	return ch
 }
 
-func (c *Config) LoadConfig(configFile string) error {
+func (c *MPConfig) LoadConfig(configFile string) error {
 	var t []byte
 	var err error
 
@@ -129,20 +119,4 @@ func (c *Config) LoadConfig(configFile string) error {
 	}
 
 	return nil
-}
-
-// Merge will transfer data from Config to MasterPW for any nil values
-func (c *Config) Merge(m *MPW) {
-	// Counter and PWType are already set by default
-	if m.Fullname == "" {
-		m.Fullname = c.Fullname
-	}
-
-	if m.Password == "" {
-		m.Password = c.Password
-	}
-
-	if m.Site == "" {
-		m.Site = c.Site
-	}
 }

@@ -18,44 +18,34 @@
 // LICENSE file.  Alternatively, see <http://www.gnu.org/licenses/>.
 //==============================================================================
 
-package main
+package config
 
 import (
-	"os"
-	"path"
-
-	"futurequest.net/FQgolibs/FQversion"
-	"github.com/TerraTech/go-MasterPassword/pkg/config"
-	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
+	"github.com/TerraTech/go-MasterPassword/pkg/common"
 )
 
-var (
-	PROG      string = path.Base(os.Args[0])
-	VERSION   string // Filled via Makefile
-	BUILD     string = FQversion.GetBUILD()
-	BUILDHOST string // Filled via Makefile
+const (
+	DefaultCounter      = common.DefaultCounter
+	DefaultPasswordType = common.DefaultPasswordType
 )
 
-type MPW struct {
-	*crypto.MasterPW
-	cu     *config.MPConfig // (MP)Config User, loaded from .toml files
-	fd     uint
-	pwFile string
-	ssp    bool
+// MPConfig is the intermediate struct for toml.Unmarshal
+//
+// userConfig =unmarshal=> MPConfig =merge=> MasterPW
+type MPConfig struct {
+	MasterPasswordSeed string `toml:"masterPasswordSeed,omitempty"`
+	PasswordType       string `toml:"passwordType,omitempty"`
+	Fullname           string `toml:"fullname,omitempty"`
+	Password           string `toml:"password,omitempty"`
+	Site               string `toml:"site,omitempty"`
+	Counter            uint32 `toml:"counter,omitempty"` // Counter >= 1
 }
 
-func main() {
-	mpw := &MPW{
-		MasterPW: crypto.NewMasterPassword(),
-		cu:       &config.MPConfig{},
+// NewMPConfig returns a new MPConfig with defaults set
+func NewMPConfig() *MPConfig {
+	return &MPConfig{
+		MasterPasswordSeed: common.DefaultMasterPasswordSeed,
+		PasswordType:       DefaultPasswordType,
+		Counter:            DefaultCounter,
 	}
-
-	handleFlags(mpw)
-
-	mPassword, err := mpw.MasterPassword()
-	if err != nil {
-		fatal(err.Error())
-	}
-
-	printPassword(mpw, mPassword)
 }

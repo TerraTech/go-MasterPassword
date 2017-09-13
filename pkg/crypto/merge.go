@@ -18,20 +18,37 @@
 // LICENSE file.  Alternatively, see <http://www.gnu.org/licenses/>.
 //==============================================================================
 
-package common_test
+package crypto
 
 import (
-	"testing"
-
-	"github.com/TerraTech/go-MasterPassword/pkg/common"
-	"github.com/stretchr/testify/assert"
+	"github.com/TerraTech/go-MasterPassword/pkg/config"
 )
 
-func TestValidateSiteCounter(t *testing.T) {
-	// good
-	assert.NoError(t, common.ValidateSiteCounter(1))
-	assert.NoError(t, common.ValidateSiteCounter(9999))
+// MergeConfig will transfer and validate data from Config to MasterPW for any nil values.
+func (mpw *MasterPW) MergeConfig() error {
+	return mpw.MergeConfigEX(mpw.Config)
+}
 
-	// bad
-	assert.Error(t, common.ErrCounter, common.ValidateSiteCounter(0))
+// MergeConfigEX will transfer and validate data from given MPConfig to MasterPW for any nil values.
+func (mpw *MasterPW) MergeConfigEX(c *config.MPConfig) error {
+	if mpw.masterPasswordSeed == "" {
+		mpw.masterPasswordSeed = c.MasterPasswordSeed
+	}
+	if mpw.passwordType == "" {
+		mpw.passwordType = c.PasswordType
+	}
+	if mpw.fullname == "" {
+		mpw.fullname = c.Fullname
+	}
+	if mpw.password == "" {
+		mpw.password = c.Password
+	}
+	if mpw.site == "" {
+		mpw.site = c.Site
+	}
+	if mpw.counter == 0 {
+		mpw.counter = c.Counter
+	}
+
+	return mpw.Validate()
 }

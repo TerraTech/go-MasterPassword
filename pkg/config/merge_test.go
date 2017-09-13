@@ -18,44 +18,32 @@
 // LICENSE file.  Alternatively, see <http://www.gnu.org/licenses/>.
 //==============================================================================
 
-package main
+package config_test
 
 import (
-	"os"
-	"path"
+	"testing"
 
-	"futurequest.net/FQgolibs/FQversion"
 	"github.com/TerraTech/go-MasterPassword/pkg/config"
 	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
+	"github.com/stretchr/testify/assert"
 )
 
-var (
-	PROG      string = path.Base(os.Args[0])
-	VERSION   string // Filled via Makefile
-	BUILD     string = FQversion.GetBUILD()
-	BUILDHOST string // Filled via Makefile
-)
-
-type MPW struct {
-	*crypto.MasterPW
-	cu     *config.MPConfig // (MP)Config User, loaded from .toml files
-	fd     uint
-	pwFile string
-	ssp    bool
-}
-
-func main() {
-	mpw := &MPW{
-		MasterPW: crypto.NewMasterPassword(),
-		cu:       &config.MPConfig{},
+// TestMergeGood tests that the merge occurred correctly.
+//
+// This needs to be run in the 'config_test' public context to avoid an import cycle
+func TestMergeGood(t *testing.T) {
+	m := &crypto.MasterPW{
+		Config: &config.MPConfig{}, // simulate what toml.Unmarshal will do to MPConfig on missing config items
+	}
+	c := &config.MPConfig{
+		MasterPasswordSeed: "masterpasswordseed",
+		PasswordType:       "passwordtype",
+		Fullname:           "fullname",
+		Password:           "password",
+		Site:               "site",
+		Counter:            69,
 	}
 
-	handleFlags(mpw)
-
-	mPassword, err := mpw.MasterPassword()
-	if err != nil {
-		fatal(err.Error())
-	}
-
-	printPassword(mpw, mPassword)
+	m.Config.Merge(c)
+	assert.Equal(t, m.Config, c)
 }

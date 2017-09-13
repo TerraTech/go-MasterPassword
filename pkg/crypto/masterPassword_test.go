@@ -23,19 +23,17 @@ package crypto_test
 import (
 	"testing"
 
+	"github.com/TerraTech/go-MasterPassword/pkg/common"
+	"github.com/TerraTech/go-MasterPassword/pkg/config"
 	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
 	"github.com/stretchr/testify/assert"
 )
 
 var mpwseeds = []string{
-	crypto.MasterPasswordSeed,
+	common.DefaultMasterPasswordSeed,
 	"overrideDefaultMPWseed",
 	"liveLifeBeyondAllYourTomorrrows",
 	"danceLikeNoOneIsLooking",
-}
-
-type mpw struct {
-	*crypto.MasterPW
 }
 
 type testVector struct {
@@ -52,19 +50,23 @@ var d = struct {
 	"user", "password", "example.com",
 }
 
-func newMpw(tv testVector) *mpw {
-	return &mpw{
-		&crypto.MasterPW{
-			MasterPasswordSeed: tv.ms,
-			Counter:            tv.c,
-			PasswordType:       tv.pt,
-			Fullname:           d.u,
-			Password:           d.pw,
-			Site:               d.s,
-		},
+func newMpw(tv testVector) (*crypto.MasterPW, error) {
+	mpw := &crypto.MasterPW{Config: &config.MPConfig{}}
+	c := &config.MPConfig{
+		MasterPasswordSeed: tv.ms,
+		Counter:            tv.c,
+		PasswordType:       tv.pt,
+		Fullname:           d.u,
+		Password:           d.pw,
+		Site:               d.s,
 	}
-}
 
+	if err := mpw.MergeConfigEX(c); err != nil {
+		return nil, err
+	}
+
+	return mpw, nil
+}
 func TestMasterPassword(t *testing.T) {
 	expectations := []testVector{
 		{mpwseeds[0], 1, "long", "ZedaFaxcZaso9*"},
@@ -95,7 +97,8 @@ func TestMasterPassword(t *testing.T) {
 
 	// Test method call
 	for _, tv := range expectations {
-		mpw := newMpw(tv)
+		mpw, err := newMpw(tv)
+		assert.NoError(t, err)
 		pw, err := mpw.MasterPassword()
 		assert.NoError(t, err)
 		assert.Equal(t, tv.expect, pw)
@@ -141,8 +144,10 @@ func TestMasterPasswordSeeds(t *testing.T) {
 
 	for seedn, tvs := range expectations {
 		for _, tv := range tvs {
-			mpw := newMpw(tv)
-			mpw.MasterPasswordSeed = mpwseeds[seedn+1]
+			mpw, err := newMpw(tv)
+			assert.NoError(t, err)
+			err = mpw.SetMasterPasswordSeed(mpwseeds[seedn+1])
+			assert.NoError(t, err)
 			pw, err := mpw.MasterPassword()
 			assert.NoError(t, err)
 			assert.Equal(t, tv.expect, pw)

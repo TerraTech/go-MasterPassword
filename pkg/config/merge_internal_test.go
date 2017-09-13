@@ -18,21 +18,32 @@
 // LICENSE file.  Alternatively, see <http://www.gnu.org/licenses/>.
 //==============================================================================
 
-package common
+package config
 
 import (
-	"errors"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-var (
-	ErrCounter = errors.New("site password counter must be >= 1")
-)
+func TestMergeBad(t *testing.T) {
+	c := &MPConfig{}
 
-// ValidateSiteCounter validates that it's value is >= 1
-func ValidateSiteCounter(counter uint32) error {
-	if counter < 1 {
-		return ErrCounter
-	}
+	testFields2Merge = defaultFields2Merge()
+	defer func() { testFields2Merge = nil }() // reset at end
 
-	return nil
+	// field count mismatch
+	//   perturb testFields2Merge to simulate a MPConfig struct member change
+	// -1
+	testFields2Merge["plusOne"] = struct{}{}
+	assert.Panics(t, func() { c.Merge(c) })
+
+	// +1
+	delete(testFields2Merge, "plusOne")
+	delete(testFields2Merge, "MasterPasswordSeed")
+	assert.Panics(t, func() { c.Merge(c) })
+
+	// field name rename
+	testFields2Merge["FieldRenamed"] = struct{}{}
+	assert.Panics(t, func() { c.Merge(c) })
 }

@@ -52,7 +52,7 @@ func flagHelp(opt string) string {
 
 func printPassword(mpw *MPW, pw string) {
 	if !mpw.ssp && isaTTY(os.Stdout.Fd()) {
-		fmt.Printf("%s's password for %s:\n", mpw.Fullname, mpw.Site)
+		fmt.Printf("%s's password for %s:\n", mpw.Config.Fullname, mpw.Config.Site)
 	}
 	fmt.Println(pw)
 }

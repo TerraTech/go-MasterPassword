@@ -18,44 +18,16 @@
 // LICENSE file.  Alternatively, see <http://www.gnu.org/licenses/>.
 //==============================================================================
 
-package main
+package common
 
-import (
-	"os"
-	"path"
+// MasterPasswordSeed is the default seed and allows it to be compatible with
+// http://masterpasswordapp.com/algorithm.html
+const (
+	// config
+	DefaultConfigFilename = "gompw.toml"
+	DefaultCounter        = 1
+	DefaultPasswordType   = "long"
 
-	"futurequest.net/FQgolibs/FQversion"
-	"github.com/TerraTech/go-MasterPassword/pkg/config"
-	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
+	// crypto
+	DefaultMasterPasswordSeed = "com.lyndir.masterpassword"
 )
-
-var (
-	PROG      string = path.Base(os.Args[0])
-	VERSION   string // Filled via Makefile
-	BUILD     string = FQversion.GetBUILD()
-	BUILDHOST string // Filled via Makefile
-)
-
-type MPW struct {
-	*crypto.MasterPW
-	cu     *config.MPConfig // (MP)Config User, loaded from .toml files
-	fd     uint
-	pwFile string
-	ssp    bool
-}
-
-func main() {
-	mpw := &MPW{
-		MasterPW: crypto.NewMasterPassword(),
-		cu:       &config.MPConfig{},
-	}
-
-	handleFlags(mpw)
-
-	mPassword, err := mpw.MasterPassword()
-	if err != nil {
-		fatal(err.Error())
-	}
-
-	printPassword(mpw, mPassword)
-}
