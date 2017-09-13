@@ -38,15 +38,19 @@ var (
 //
 //   1) masterPasswordSeed
 //   2) passwordType
-//   3) fullname
-//   4) password
-//   5) site
-//   6) counter
+//   3) passwordPurpose
+//   4) fullname
+//   5) password
+//   6) site
+//   7) counter
 func (mpw *MasterPW) Validate() error {
 	if err := ValidateMasterPasswordSeed(mpw.masterPasswordSeed); err != nil {
 		return err
 	}
 	if err := ValidatePasswordType(mpw.passwordType); err != nil {
+		return err
+	}
+	if err := mpw.ValidatePasswordPurpose(); err != nil {
 		return err
 	}
 	if err := ValidateFullname(mpw.fullname); err != nil {
