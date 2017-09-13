@@ -26,9 +26,9 @@ import (
 	"github.com/TerraTech/go-MasterPassword/pkg/common"
 )
 
-const (
-	DefaultPasswordPurpose = common.DefaultPasswordPurpose
+const DefaultPasswordPurpose = common.DefaultPasswordPurpose
 
+const (
 	PasswordPurposeUnSet PasswordPurpose = iota
 	PasswordPurposeAuthentication
 	PasswordPurposeIdentification
