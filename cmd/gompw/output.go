@@ -28,7 +28,14 @@ import (
 
 const passwordTypeHelpIndent = 28
 
-var passwordTypeHelp = `Specify the password's type template
+var helpMsg = map[string]string {
+	"p": `The purpose of the generated token
+Defaults to 'auth'
+    a, auth     | An authentication token such as a password
+    i, ident    | An identification token such as a username
+    r, rec      | A recovery token such as a security answer`,
+
+	"t": `Specify the password's type template
 Defaults to 'long'
     x, maximum  | 20 characters, contains symbols
     l, long     | Copy-friendly, 14 characters, symbols
@@ -37,17 +44,17 @@ Defaults to 'long'
     s, short    | Copy-friendly, 4 characters, no symbols
     i, pin      | 4 numbers
     n, name     | 9 letter name
-    p, phrase   | 20 character sentence`
+    p, phrase   | 20 character sentence`,
+}
 
 func flagHelp(opt string) string {
-	var help string
-	switch opt {
-	case "t":
-		indention := strings.Repeat(" ", passwordTypeHelpIndent)
-		help = strings.Replace(passwordTypeHelp, "\n", "\n"+indention, -1)
+	if _, ok := helpMsg[opt]; !ok {
+		return ""
 	}
 
-	return help
+	indention := strings.Repeat(" ", passwordTypeHelpIndent)
+
+	return strings.Replace(helpMsg[opt], "\n", "\n"+indention, -1)
 }
 
 func printPassword(mpw *MPW, pw string) {
