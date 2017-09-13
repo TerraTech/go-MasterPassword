@@ -28,7 +28,7 @@ import (
 
 const passwordTypeHelpIndent = 28
 
-var helpMsg = map[string]string {
+var helpMsg = map[string]string{
 	"p": `The purpose of the generated token
 Defaults to 'auth'
     a, auth     | An authentication token such as a password
