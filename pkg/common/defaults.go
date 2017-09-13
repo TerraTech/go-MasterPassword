@@ -20,7 +20,7 @@
 
 package common
 
-// MasterPasswordSeed is the default seed and allows it to be compatible with
+// DefaultMasterPasswordSeed defaults to the universal seed as defined by:
 // http://masterpasswordapp.com/algorithm.html
 const (
 	// config
@@ -30,4 +30,5 @@ const (
 
 	// crypto
 	DefaultMasterPasswordSeed = "com.lyndir.masterpassword"
+	DefaultPasswordPurpose    = "auth"
 )

@@ -22,9 +22,13 @@ package crypto
 
 import (
 	"errors"
+
+	"github.com/TerraTech/go-MasterPassword/pkg/common"
 )
 
 const (
+	DefaultPasswordPurpose = common.DefaultPasswordPurpose
+
 	PasswordPurposeUnSet PasswordPurpose = iota
 	PasswordPurposeAuthentication
 	PasswordPurposeIdentification
