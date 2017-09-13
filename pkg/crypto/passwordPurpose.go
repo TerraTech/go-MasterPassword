@@ -62,9 +62,10 @@ var (
 // Given the same {fullname, password, site}, specifying a different 'purpose' will perturb the final generated password
 // in a consistent manner.
 //
-//   0) Authentication
-//   1) Identification
-//   2) Recovery
+//   0) *Unset*
+//   1) Authentication
+//   2) Identification
+//   3) Recovery
 type PasswordPurpose int
 
 func (p *PasswordPurpose) String() string {
