@@ -202,7 +202,6 @@ func TestMasterPasswordPurposeGood(t *testing.T) {
 			{mpwseeds[2], 1, "name", "rec", "viwjipubu"},
 			{mpwseeds[2], 1, "phrase", "rec", "viwj pub daysixu jad"},
 		},
-
 	}
 
 	for _, tvs := range expectations {
@@ -221,25 +220,29 @@ func TestMasterPasswordPurposeGood(t *testing.T) {
 }
 
 func TestMasterPasswordPurposeBad(t *testing.T) {
-	expectations := []struct{
-		tv testVector
+	expectations := []struct {
+		tv        testVector
 		sppE, mpE error
 	}{
-			{testVector{mpwseeds[0], 1, "long", "noexist", "noneshallpass!"}, crypto.ErrPasswordPurposeInvalid, crypto.ErrPasswordPurposeInvalid},
-			{testVector{mpwseeds[0], 69, "long", "noexist", "'tisbutascratch!"}, crypto.ErrPasswordPurposeInvalid, crypto.ErrPasswordPurposeInvalid},
-			{testVector{mpwseeds[0], 69, "long", "ident", "ascratch?yourarmsoff"}, crypto.ErrPasswordPurposeInvalid, crypto.ErrPasswordPurposeCounterOutOfRange},
-			{testVector{mpwseeds[0], 69, "long", "rec", "it'sjustafleshwound"}, crypto.ErrPasswordPurposeInvalid, crypto.ErrPasswordPurposeCounterOutOfRange},
+		{testVector{mpwseeds[0], 1, "long", "noexist", "noneshallpass!"}, crypto.ErrPasswordPurposeInvalid, crypto.ErrPasswordPurposeInvalid},
+		{testVector{mpwseeds[0], 69, "long", "noexist", "'tisbutascratch!"}, crypto.ErrPasswordPurposeInvalid, crypto.ErrPasswordPurposeInvalid},
+		{testVector{mpwseeds[0], 69, "long", "ident", "ascratch?yourarmsoff"}, crypto.ErrPasswordPurposeInvalid, crypto.ErrPasswordPurposeCounterOutOfRange},
+		{testVector{mpwseeds[0], 69, "long", "rec", "it'sjustafleshwound"}, crypto.ErrPasswordPurposeInvalid, crypto.ErrPasswordPurposeCounterOutOfRange},
 	}
 
 	for _, e := range expectations {
-			mpw := &crypto.MasterPW{Config: newMpConfig(e.tv)}
+		mpw := &crypto.MasterPW{Config: newMpConfig(e.tv)}
 
-			// test SetPasswordPurpose() validation path
-			err := mpw.SetPasswordPurpose(e.tv.ms)
-			if assert.Error(t, err) { assert.Equal(t, err, e.sppE) }
+		// test SetPasswordPurpose() validation path
+		err := mpw.SetPasswordPurpose(e.tv.ms)
+		if assert.Error(t, err) {
+			assert.Equal(t, err, e.sppE)
+		}
 
-			// test MasterPassword() validation path via MergeConfig()
-			_, err = mpw.MasterPassword()
-			if assert.Error(t, err) { assert.Equal(t, err, e.mpE) }
+		// test MasterPassword() validation path via MergeConfig()
+		_, err = mpw.MasterPassword()
+		if assert.Error(t, err) {
+			assert.Equal(t, err, e.mpE)
+		}
 	}
 }

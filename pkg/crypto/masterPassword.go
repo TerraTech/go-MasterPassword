@@ -43,7 +43,7 @@ const MpwSeries = "2.6"
 const DefaultMasterPasswordSeed = common.DefaultMasterPasswordSeed
 
 var (
-	Dbg = debug.NewDebug().Dbg
+	Dbg  = debug.NewDebug().Dbg
 	DbgO = debug.NewDebug().DbgO
 )
 
@@ -121,14 +121,14 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 	Dbg("siteCounter: %d", mpw.counter)
 	// FIXME: stringer doesn't appear to be working right
 	Dbg("keyPurpose: %d (%s)", mpw.passwordPurpose, mpw.passwordPurpose.String())
-	Dbg("keyContext: (null)")  // not implemented
+	Dbg("keyContext: (null)") // not implemented
 	Dbg("keyScope: %s", mpseed)
 	Dbg("siteSalt: keyScope=%s | #siteName=%08X | siteName=%s | siteCounter=%08d | #keyContext=(null) | keyContext=(null)",
 		mpseed, len(mpw.site), mpw.site, mpw.counter)
 
 	// Danger Will Robinson, passwordPurpose comes into effect here, so caution with the Truncate()
 	buffer.Truncate(len(mpw.masterPasswordSeed))
-	buffer.WriteString(mpw.purpose())  // add the passwordPurpose suffix
+	buffer.WriteString(mpw.purpose()) // add the passwordPurpose suffix
 	binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.site)))
 	buffer.WriteString(mpw.site)
 	binary.Write(&buffer, binary.BigEndian, mpw.counter)
