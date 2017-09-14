@@ -30,6 +30,7 @@ import (
 	"strconv"
 
 	"github.com/TerraTech/go-MasterPassword/pkg/common"
+	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
 
 	flag "github.com/spf13/pflag"
 )
@@ -128,6 +129,20 @@ func handleFlags(mpw *MPW) {
 	// -I and -C are mutually exclusive
 	if flag.ShorthandLookup("I").Changed && flag.ShorthandLookup("C").Changed {
 		fatal("-I and -C are mutually exclusive.")
+	}
+
+	// -c ( >1 ) does not work with -p [i,r] (or -p [!a])
+	if mpw.Config.Counter > 1 && flag.ShorthandLookup("c").Changed && flag.ShorthandLookup("p").Changed {
+		if err := crypto.ValidatePasswordPurpose(mpw.Config.PasswordPurpose); err != nil {
+			fatal(err.Error())
+		}
+		token, err := crypto.PasswordPurposeToToken(mpw.Config.PasswordPurpose)
+		if err != nil {
+			fatal(err.Error())
+		}
+		if token != crypto.PasswordPurposeAuthentication {
+			fatal(crypto.ErrPasswordPurposeCounterOutOfRange.Error())
+		}
 	}
 
 	// prime the pump

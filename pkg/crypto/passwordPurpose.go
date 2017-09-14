@@ -36,8 +36,9 @@ const (
 )
 
 var (
-	ErrPasswordPurposeEmpty   = errors.New("Site password purpose must be set")
-	ErrPasswordPurposeInvalid = errors.New("Invalid site password purpose")
+	ErrPasswordPurposeEmpty             = errors.New("Site password purpose must be set")
+	ErrPasswordPurposeInvalid           = errors.New("Invalid site password purpose")
+	ErrPasswordPurposeCounterOutOfRange = errors.New("Site password purpose is using an out of range counter")
 )
 
 var (
@@ -63,9 +64,11 @@ var (
 // in a consistent manner.
 //
 //   0) *Unset*
-//   1) Authentication
-//   2) Identification
-//   3) Recovery
+//   1) Authentication  (counter=N)
+//   2) Identification  (counter=1)
+//   3) Recovery        (counter=1)
+//
+//   NOTE: Authentication is perturbed by counter, whereas the others are not.
 type PasswordPurpose int
 
 func (p *PasswordPurpose) String() string {
@@ -101,6 +104,16 @@ func (pp *PasswordPurpose) Validate() error {
 	}
 
 	return nil
+}
+
+// PasswordPurposeToToken returns the const token associated with given purpose
+func PasswordPurposeToToken(purpose string) (PasswordPurpose, error) {
+	token, ok := ppmap[purpose]
+	if !ok {
+		return PasswordPurposeUnSet, ErrPasswordPurposeInvalid
+	}
+
+	return token, nil
 }
 
 // ValidatePasswordPurpose will test if given purpose is valid
