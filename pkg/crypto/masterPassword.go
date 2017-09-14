@@ -85,7 +85,6 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 
 	// DUMP mpw
 	if os.Getenv("MP_DUMP") != "" {
-		mpw.masterPasswordSeed = mpseed
 		fmt.Fprintf(os.Stderr, "\n== DUMP =======\n")
 		FQdebug.D(mpw)
 		fmt.Fprintf(os.Stderr, "===============\n\n")
@@ -103,7 +102,7 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 	templates := passwordTypeTemplates[mpw.passwordType]
 
 	var buffer bytes.Buffer
-	buffer.WriteString(mpseed)
+	buffer.WriteString(mpw.masterPasswordSeed)
 	binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.fullname)))
 	buffer.WriteString(mpw.fullname)
 
@@ -114,8 +113,6 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to generate password: %s", err)
 	}
-
-	buffer.Truncate(len(mpseed))
 	Dbg("masterKey: scrypt( masterPassword, masterKeySalt, N=32768, r=8, p=2, keyLen=64")
 	Dbg("  => masterKey.id: %s", mpwIdBuf(key))
 
@@ -130,6 +127,8 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 		mpseed, len(mpw.site), mpw.site, mpw.counter)
 
 	// Danger Will Robinson, passwordPurpose comes into effect here, so caution with the Truncate()
+	buffer.Truncate(len(mpw.masterPasswordSeed))
+	buffer.WriteString(mpw.purpose())  // add the passwordPurpose suffix
 	binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.site)))
 	buffer.WriteString(mpw.site)
 	binary.Write(&buffer, binary.BigEndian, mpw.counter)
