@@ -76,7 +76,11 @@ func (d *Debug) Dbg(format string, a ...interface{}) {
 		return
 	}
 
-	log.Printf("[DEBUG] "+format, a...)
+	logIt(format, a...)
+}
+
+func (d *Debug) DbgO(format string, a ...interface{}) {
+	logIt(format, a...)
 }
 
 func (d *Debug) SetFilename(f string) {
@@ -98,6 +102,10 @@ func (d *Debug) wantDebug(cf string) bool {
 	}
 
 	return false
+}
+
+func logIt(format string, a ...interface{}) {
+	log.Printf("[DEBUG] "+format, a...)
 }
 
 func normalize(f string) string {
