@@ -31,6 +31,7 @@ import (
 	"futurequest.net/FQgolibs/FQdebug"
 	"github.com/TerraTech/go-MasterPassword/pkg/common"
 	"github.com/TerraTech/go-MasterPassword/pkg/config"
+	"github.com/TerraTech/go-MasterPassword/pkg/debug"
 	"golang.org/x/crypto/scrypt"
 )
 
@@ -40,6 +41,11 @@ const MpwSeries = "2.6"
 // MasterPasswordSeed is the default seed and allows it to be compatible with
 // http://masterpasswordapp.com/algorithm.html
 const DefaultMasterPasswordSeed = common.DefaultMasterPasswordSeed
+
+var (
+	Dbg = debug.NewDebug().Dbg
+	DbgO = debug.NewDebug().DbgO
+)
 
 // MasterPW contains all relevant items for MasterPassword to act upon.
 type MasterPW struct {
@@ -84,6 +90,15 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 		FQdebug.D(mpw)
 		fmt.Fprintf(os.Stderr, "===============\n\n")
 	}
+	// FIXME: convert to template
+	//   Pro: cleans up the code and removes the Dbg() interstitials
+	//   Con: if something panics, might not have reached the template call
+	Dbg("-- mpw_masterKey (algorithm: 3)")
+	Dbg("fullName: %s", mpw.fullname)
+	Dbg("password: %s", mpw.password)
+	Dbg("masterPassword.id: %s", mpwIdBuf([]byte(mpw.password)))
+	Dbg("keyScope: %s", mpw.masterPasswordSeed)
+	Dbg("masterKeySalt: keyScope=%s | #fullName=%08X | fullName=%s", mpw.masterPasswordSeed, len(mpw.fullname), mpw.fullname)
 
 	templates := passwordTypeTemplates[mpw.passwordType]
 
@@ -93,19 +108,39 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 	buffer.WriteString(mpw.fullname)
 
 	salt := buffer.Bytes()
+	Dbg("  => masterKeySalt.id: %s", mpwIdBuf(salt))
+
 	key, err := scrypt.Key([]byte(mpw.password), salt, 32768, 8, 2, 64)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate password: %s", err)
 	}
 
 	buffer.Truncate(len(mpseed))
+	Dbg("masterKey: scrypt( masterPassword, masterKeySalt, N=32768, r=8, p=2, keyLen=64")
+	Dbg("  => masterKey.id: %s", mpwIdBuf(key))
+
+	Dbg("-- mpw_siteKey (algorithm: 3)")
+	Dbg("siteName: %s", mpw.site)
+	Dbg("siteCounter: %d", mpw.counter)
+	// FIXME: stringer doesn't appear to be working right
+	Dbg("keyPurpose: %d (%s)", mpw.passwordPurpose, mpw.passwordPurpose.String())
+	Dbg("keyContext: (null)")  // not implemented
+	Dbg("keyScope: %s", mpseed)
+	Dbg("siteSalt: keyScope=%s | #siteName=%08X | siteName=%s | siteCounter=%08d | #keyContext=(null) | keyContext=(null)",
+		mpseed, len(mpw.site), mpw.site, mpw.counter)
+
+	// Danger Will Robinson, passwordPurpose comes into effect here, so caution with the Truncate()
 	binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.site)))
 	buffer.WriteString(mpw.site)
 	binary.Write(&buffer, binary.BigEndian, mpw.counter)
+	Dbg("  => siteSalt.id: %s", mpwIdBuf(buffer.Bytes()))
 
+	Dbg("siteKey: hmac-sha256( masterKey.id=%s, siteSalt )", mpwIdBuf(key))
 	var hmacv = hmac.New(sha256.New, key)
 	hmacv.Write(buffer.Bytes())
 	var seed = hmacv.Sum(nil)
+	Dbg("  => siteKey.id: %s", mpwIdBuf(seed))
+
 	var temp = templates[int(seed[0])%len(templates)]
 
 	buffer.Truncate(0)
