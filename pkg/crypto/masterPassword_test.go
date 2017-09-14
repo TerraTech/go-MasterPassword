@@ -51,9 +51,8 @@ var d = struct {
 	"user", "password", "example.com",
 }
 
-func newMpw(tv testVector) (*crypto.MasterPW, error) {
-	mpw := &crypto.MasterPW{Config: &config.MPConfig{}}
-	c := &config.MPConfig{
+func newMpConfig(tv testVector) *config.MPConfig {
+	return &config.MPConfig{
 		MasterPasswordSeed: tv.ms,
 		Counter:            tv.c,
 		PasswordType:       tv.pt,
@@ -62,6 +61,11 @@ func newMpw(tv testVector) (*crypto.MasterPW, error) {
 		Password:           d.pw,
 		Site:               d.s,
 	}
+}
+
+func newMpw(tv testVector) (*crypto.MasterPW, error) {
+	mpw := &crypto.MasterPW{Config: &config.MPConfig{}}
+	c := newMpConfig(tv)
 
 	if err := mpw.MergeConfigEX(c); err != nil {
 		return nil, err
@@ -69,6 +73,7 @@ func newMpw(tv testVector) (*crypto.MasterPW, error) {
 
 	return mpw, nil
 }
+
 func TestMasterPassword(t *testing.T) {
 	expectations := []testVector{
 		{mpwseeds[0], 1, "long", "auth", "ZedaFaxcZaso9*"},
@@ -154,5 +159,87 @@ func TestMasterPasswordSeeds(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, tv.expect, pw)
 		}
+	}
+}
+
+// TestMasterPasswordPurpose tests reasonable permutaions of MasterPasswordSeed and PasswordPurpose.
+//
+// Due to scrypt, these tests take a long time, therefore the tests will use the following matrix.
+//   [seed#:purpose]
+//   0:auth
+//   1:ident
+//   2:rec
+func TestMasterPasswordPurposeGood(t *testing.T) {
+	expectations := [][]testVector{
+		{
+			{mpwseeds[0], 1, "long", "auth", "ZedaFaxcZaso9*"},
+			{mpwseeds[0], 2, "long", "auth", "Fovi2@JifpTupx"},
+			{mpwseeds[0], 1, "maximum", "auth", "pf4zS1LjCg&LjhsZ7T2~"},
+			{mpwseeds[0], 1, "medium", "auth", "ZedJuz8$"},
+			{mpwseeds[0], 1, "basic", "auth", "pIS54PLs"},
+			{mpwseeds[0], 1, "short", "auth", "Zed5"},
+			{mpwseeds[0], 1, "pin", "auth", "6685"},
+			{mpwseeds[0], 1, "name", "auth", "zedjuzoco"},
+			{mpwseeds[0], 1, "phrase", "auth", "ze juzxo sax taxocre"},
+		},
+		{
+			{mpwseeds[1], 1, "long", "ident", "PomfGidl9(Yamo"},
+			{mpwseeds[1], 1, "maximum", "ident", "F8*W(egRYrmddQI^U(bn"},
+			{mpwseeds[1], 1, "medium", "ident", "Pom1/Qil"},
+			{mpwseeds[1], 1, "basic", "ident", "Ft61eGO9"},
+			{mpwseeds[1], 1, "short", "ident", "Pom1"},
+			{mpwseeds[1], 1, "pin", "ident", "1861"},
+			{mpwseeds[1], 1, "name", "ident", "pomfuqilu"},
+			{mpwseeds[1], 1, "phrase", "ident", "pom gidluzabi zuna"},
+		},
+		{
+			{mpwseeds[2], 1, "long", "rec", "Viwa2_VaruJusk"},
+			{mpwseeds[2], 1, "maximum", "rec", "lJNzh4i%^rz0amLkPe0_"},
+			{mpwseeds[2], 1, "medium", "rec", "ViwJip9~"},
+			{mpwseeds[2], 1, "basic", "rec", "lSo5rrW0"},
+			{mpwseeds[2], 1, "short", "rec", "Viw5"},
+			{mpwseeds[2], 1, "pin", "rec", "7245"},
+			{mpwseeds[2], 1, "name", "rec", "viwjipubu"},
+			{mpwseeds[2], 1, "phrase", "rec", "viwj pub daysixu jad"},
+		},
+
+	}
+
+	for _, tvs := range expectations {
+		for _, tv := range tvs {
+			mpw, err := newMpw(tv)
+			assert.NoError(t, err)
+
+			err = mpw.SetMasterPasswordSeed(tv.ms)
+			assert.NoError(t, err)
+
+			pw, err := mpw.MasterPassword()
+			assert.NoError(t, err)
+			assert.Equal(t, tv.expect, pw)
+		}
+	}
+}
+
+func TestMasterPasswordPurposeBad(t *testing.T) {
+	expectations := []struct{
+		tv testVector
+		sppE, mpE error
+	}{
+			{testVector{mpwseeds[0], 1, "long", "noexist", "noneshallpass!"}, crypto.ErrPasswordPurposeInvalid, crypto.ErrPasswordPurposeInvalid},
+			{testVector{mpwseeds[0], 69, "long", "noexist", "'tisbutascratch!"}, crypto.ErrPasswordPurposeInvalid, crypto.ErrPasswordPurposeInvalid},
+			{testVector{mpwseeds[0], 69, "long", "ident", "ascratch?yourarmsoff"}, crypto.ErrPasswordPurposeInvalid, crypto.ErrPasswordPurposeCounterOutOfRange},
+			{testVector{mpwseeds[0], 69, "long", "rec", "it'sjustafleshwound"}, crypto.ErrPasswordPurposeInvalid, crypto.ErrPasswordPurposeCounterOutOfRange},
+	}
+
+	for _, e := range expectations {
+			mpw := &crypto.MasterPW{Config: newMpConfig(e.tv)}
+
+			// test SetPasswordPurpose() validation path
+			err := mpw.SetPasswordPurpose(e.tv.ms)
+			if assert.Error(t, err) { assert.Equal(t, err, e.sppE) }
+
+			// test MasterPassword() validation path via MergeConfig()
+			_, err = mpw.MasterPassword()
+			if assert.Error(t, err) { assert.Equal(t, err, e.mpE) }
 	}
 }
