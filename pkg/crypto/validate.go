@@ -66,6 +66,16 @@ func (mpw *MasterPW) Validate() error {
 		return err
 	}
 
+	// Extra test to catch the following constraints:
+	//   0 > auth >= 1
+	//   0 > ident <= 1
+	//   0 > rec   <= 1
+	if mpw.passwordPurpose != PasswordPurposeAuthentication {
+		if mpw.counter > 1 {
+			return ErrPasswordPurposeCounterOutOfRange
+		}
+	}
+
 	return nil
 }
 
