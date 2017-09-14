@@ -71,7 +71,7 @@ func TestLoadConfig(t *testing.T) {
 
 	// test against empty gompw.toml
 	expected = &config.MPConfig{
-		MasterPasswordSeed: common.MasterPasswordSeed,
+		MasterPasswordSeed: common.DefaultMasterPasswordSeed,
 		PasswordType:       "long",
 		Counter:            1,
 	}

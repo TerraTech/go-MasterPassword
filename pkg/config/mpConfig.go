@@ -34,6 +34,7 @@ const (
 // userConfig =unmarshal=> MPConfig =merge=> MasterPW
 type MPConfig struct {
 	MasterPasswordSeed string `toml:"masterPasswordSeed,omitempty"`
+	PasswordPurpose    string `toml:"passwordPurpose,omitempty"`
 	PasswordType       string `toml:"passwordType,omitempty"`
 	Fullname           string `toml:"fullname,omitempty"`
 	Password           string `toml:"password,omitempty"`

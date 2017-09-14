@@ -30,6 +30,7 @@ import (
 	"strconv"
 
 	"github.com/TerraTech/go-MasterPassword/pkg/common"
+	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
 
 	flag "github.com/spf13/pflag"
 )
@@ -57,6 +58,7 @@ func handleFlags(mpw *MPW) {
 		//             MP_DEBUG
 		//             MP_DUMP
 		fmt.Println("  MP_FULLNAME     | The full name of the user (see -u)")
+		fmt.Println("  MP_PWPURPOSE    | The password purpose (see -p)")
 		fmt.Println("  MP_PWTYPE       | The password type (see -t)")
 		fmt.Println("  MP_SEED         | The master password seed (see -S)")
 		fmt.Println("  MP_SITE         | The site for generated password")
@@ -97,6 +99,7 @@ func handleFlags(mpw *MPW) {
 	flag.StringVarP(&configFile, "config", "C", "", "User configuration file override")
 	flag.StringVarP(&mpw.Config.Fullname, "fullname", "u", os.Getenv("MP_FULLNAME"), "Fullname")
 	flag.StringVarP(&mpw.Config.MasterPasswordSeed, "mpseed", "S", flagDefaults(common.DefaultMasterPasswordSeed, os.Getenv("MP_SEED")), "Override the Master Password Seed")
+	flag.StringVarP(&mpw.Config.PasswordPurpose, "purpose", "p", flagDefaults(common.DefaultPasswordPurpose, os.Getenv("MP_PWPURPOSE")), flagHelp("p"))
 	flag.StringVarP(&mpw.Config.PasswordType, "pwtype", "t", flagDefaults(common.DefaultPasswordType, os.Getenv("MP_PWTYPE")), flagHelp("t"))
 	flag.StringVarP(&mpw.pwFile, "file", "f", "", "Read user's master password from given filename")
 	flag.Uint32VarP(&mpw.Config.Counter, "counter", "c", flagDefaultCounter(common.DefaultCounter, os.Getenv("MP_SITECOUNTER")), "Site password counter value")
@@ -126,6 +129,20 @@ func handleFlags(mpw *MPW) {
 	// -I and -C are mutually exclusive
 	if flag.ShorthandLookup("I").Changed && flag.ShorthandLookup("C").Changed {
 		fatal("-I and -C are mutually exclusive.")
+	}
+
+	// -c ( >1 ) does not work with -p [i,r] (or -p [!a])
+	if mpw.Config.Counter > 1 && flag.ShorthandLookup("c").Changed && flag.ShorthandLookup("p").Changed {
+		if err := crypto.ValidatePasswordPurpose(mpw.Config.PasswordPurpose); err != nil {
+			fatal(err.Error())
+		}
+		token, err := crypto.PasswordPurposeToToken(mpw.Config.PasswordPurpose)
+		if err != nil {
+			fatal(err.Error())
+		}
+		if token != crypto.PasswordPurposeAuthentication {
+			fatal(crypto.ErrPasswordPurposeCounterOutOfRange.Error())
+		}
 	}
 
 	// prime the pump

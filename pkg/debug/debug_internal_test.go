@@ -18,17 +18,43 @@
 // LICENSE file.  Alternatively, see <http://www.gnu.org/licenses/>.
 //==============================================================================
 
-package common
+package debug
 
-// DefaultMasterPasswordSeed defaults to the universal seed as defined by:
-// http://masterpasswordapp.com/algorithm.html
-const (
-	// config
-	DefaultConfigFilename = "gompw.toml"
-	DefaultCounter        = 1
-	DefaultPasswordType   = "long"
+import (
+	"bytes"
+	"log"
+	"os"
+	"testing"
 
-	// crypto
-	DefaultMasterPasswordSeed = "com.lyndir.masterpassword"
-	DefaultPasswordPurpose    = "auth"
+	"github.com/stretchr/testify/assert"
 )
+
+func captureLogOutput(f func()) string {
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
+	f()
+	log.SetOutput(os.Stderr)
+
+	return buf.String()
+}
+
+func Test_wantDebug(t *testing.T) {
+	d := NewDebug()
+	d.SetFilename("foo/bar.go")
+
+	assert.True(t, d.wantDebug("foo/bar.go"))
+	assert.True(t, d.wantDebug("a/b/c/foo/bar.go"))
+	assert.False(t, d.wantDebug("bar.go"))
+	assert.False(t, d.wantDebug("ar.go"))
+}
+
+func TestDbg(t *testing.T) {
+	d := NewDebug()
+	d.SetFilename("debug/debug_internal_test.go")
+
+	expect := "ZtesTingZ"
+	output := captureLogOutput(func() {
+		d.Dbg(expect)
+	})
+	assert.Contains(t, output, expect)
+}

@@ -34,6 +34,9 @@ func (mpw *MasterPW) MergeConfigEX(c *config.MPConfig) error {
 	if mpw.masterPasswordSeed == "" {
 		mpw.masterPasswordSeed = c.MasterPasswordSeed
 	}
+	if mpw.passwordPurpose == PasswordPurposeUnSet {
+		mpw.SetPasswordPurpose(c.PasswordPurpose)
+	}
 	if mpw.passwordType == "" {
 		mpw.passwordType = c.PasswordType
 	}

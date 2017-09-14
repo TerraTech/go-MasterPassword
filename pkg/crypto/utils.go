@@ -18,17 +18,16 @@
 // LICENSE file.  Alternatively, see <http://www.gnu.org/licenses/>.
 //==============================================================================
 
-package common
+package crypto
 
-// DefaultMasterPasswordSeed defaults to the universal seed as defined by:
-// http://masterpasswordapp.com/algorithm.html
-const (
-	// config
-	DefaultConfigFilename = "gompw.toml"
-	DefaultCounter        = 1
-	DefaultPasswordType   = "long"
-
-	// crypto
-	DefaultMasterPasswordSeed = "com.lyndir.masterpassword"
-	DefaultPasswordPurpose    = "auth"
+import (
+	"crypto/sha256"
+	"fmt"
 )
+
+// mpw_id_buf()
+func mpwIdBuf(buf []byte) string {
+	sum := sha256.Sum256(buf)
+
+	return fmt.Sprintf("%02X", sum)
+}

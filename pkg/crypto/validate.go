@@ -38,15 +38,19 @@ var (
 //
 //   1) masterPasswordSeed
 //   2) passwordType
-//   3) fullname
-//   4) password
-//   5) site
-//   6) counter
+//   3) passwordPurpose
+//   4) fullname
+//   5) password
+//   6) site
+//   7) counter
 func (mpw *MasterPW) Validate() error {
 	if err := ValidateMasterPasswordSeed(mpw.masterPasswordSeed); err != nil {
 		return err
 	}
 	if err := ValidatePasswordType(mpw.passwordType); err != nil {
+		return err
+	}
+	if err := mpw.ValidatePasswordPurpose(); err != nil {
 		return err
 	}
 	if err := ValidateFullname(mpw.fullname); err != nil {
@@ -60,6 +64,16 @@ func (mpw *MasterPW) Validate() error {
 	}
 	if err := ValidateCounter(mpw.counter); err != nil {
 		return err
+	}
+
+	// Extra test to catch the following constraints:
+	//   0 > auth >= 1
+	//   0 > ident <= 1
+	//   0 > rec   <= 1
+	if mpw.passwordPurpose != PasswordPurposeAuthentication {
+		if mpw.counter > 1 {
+			return ErrPasswordPurposeCounterOutOfRange
+		}
 	}
 
 	return nil
@@ -100,6 +114,10 @@ func ValidatePassword(password string) error {
 
 	return nil
 }
+
+/*
+ * ValidatePasswordPurpose(): passwordPurpose.go
+ */
 
 // ValidatePasswordType verifies that passwordType is not empty and a valid type
 func ValidatePasswordType(passwordType string) error {
