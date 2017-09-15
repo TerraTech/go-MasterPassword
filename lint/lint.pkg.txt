@@ -1,4 +1,3 @@
-pkg/crypto/setters.go:67:1:warning: comment on exported method MasterPW.SetSite should be of the form "SetSite ..." (golint)
 pkg/crypto/utils.go:29:6:warning: func mpwIdBuf should be mpwIDBuf (golint)
 pkg/crypto/validate.go:28:2:warning: exported var ErrCounter should have comment or be unexported (golint)
 pkg/debug/debug.go:36:2:warning: exported var D should have comment or be unexported (golint)
