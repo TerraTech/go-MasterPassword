@@ -70,13 +70,15 @@ func NewMasterPassword() *MasterPW {
 //
 //   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
 func (mpw *MasterPW) MasterPassword() (string, error) {
+	var err error
+
 	// Fixup MasterPasswordSeed if ""
 	if mpw.masterPasswordSeed == "" && mpw.Config.MasterPasswordSeed == "" {
 		mpw.Config.MasterPasswordSeed = DefaultMasterPasswordSeed
 	}
 
 	// merge (and validate) Config ==> MasterPW
-	if err := mpw.MergeConfig(); err != nil {
+	if err = mpw.MergeConfig(); err != nil {
 		return "", err
 	}
 
@@ -103,7 +105,9 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 
 	var buffer bytes.Buffer
 	buffer.WriteString(mpw.masterPasswordSeed)
-	binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.fullname)))
+	if err = binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.fullname))); err != nil {
+		return "", err
+	}
 	buffer.WriteString(mpw.fullname)
 
 	salt := buffer.Bytes()
@@ -129,14 +133,20 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 	// Danger Will Robinson, passwordPurpose comes into effect here, so caution with the Truncate()
 	buffer.Truncate(len(mpw.masterPasswordSeed))
 	buffer.WriteString(mpw.purpose()) // add the passwordPurpose suffix
-	binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.site)))
+	if err = binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.site))); err != nil {
+		return "", err
+	}
 	buffer.WriteString(mpw.site)
-	binary.Write(&buffer, binary.BigEndian, mpw.counter)
+	if err = binary.Write(&buffer, binary.BigEndian, mpw.counter); err != nil {
+		return "", err
+	}
 	Dbg("  => siteSalt.id: %s", mpwIdBuf(buffer.Bytes()))
 
 	Dbg("siteKey: hmac-sha256( masterKey.id=%s, siteSalt )", mpwIdBuf(key))
 	var hmacv = hmac.New(sha256.New, key)
-	hmacv.Write(buffer.Bytes())
+	if _, err = hmacv.Write(buffer.Bytes()); err != nil {
+		return "", err
+	}
 	var seed = hmacv.Sum(nil)
 	Dbg("  => siteKey.id: %s", mpwIdBuf(seed))
 
