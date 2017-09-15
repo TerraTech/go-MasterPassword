@@ -23,6 +23,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"futurequest.net/FQgolibs/FQversion"
@@ -30,11 +31,11 @@ import (
 )
 
 var (
-	MP_DEBUG bool
+	mpDebug = os.Getenv("MP_DEBUG") != ""
 )
 
-func DEBUG(msg string) {
-	if MP_DEBUG {
+func debug(msg string) {
+	if mpDebug {
 		log.Printf("[DEBUG] %s", msg)
 	}
 }

@@ -66,10 +66,10 @@ func (mpw *mpw) handlePassword() {
 	var errNoPassword = "Password must be specified"
 	if flag.ShorthandLookup("f").Changed || flag.ShorthandLookup("d").Changed {
 		if flag.ShorthandLookup("f").Changed {
-			DEBUG("pwInput: file")
+			debug("pwInput: file")
 			pwInput, err = os.Open(mpw.pwFile)
 		} else if flag.ShorthandLookup("d").Changed {
-			DEBUG("pwInput: fd")
+			debug("pwInput: fd")
 			pwInput = os.NewFile(uintptr(mpw.fd), "")
 		}
 		if err != nil {
@@ -91,7 +91,7 @@ func (mpw *mpw) handlePassword() {
 			fatal(errNoPassword)
 		}
 	} else {
-		DEBUG("pwInput: stdin")
+		debug("pwInput: stdin")
 		mpw.Config.Password = mpw.getResponse("Your master password: ", errNoPassword)
 	}
 }
@@ -163,10 +163,6 @@ func handleFlags(mpw *mpw) {
 	flag.UintVarP(&mpw.fd, "fd", "d", 0, "Read user's master password from given file descriptor")
 
 	flag.Parse()
-
-	if os.Getenv("MP_DEBUG") != "" {
-		MP_DEBUG = true
-	}
 
 	if flagShowVersion {
 		showVersion()
