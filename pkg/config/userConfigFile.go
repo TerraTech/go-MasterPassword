@@ -31,10 +31,6 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
-const (
-	DefaultConfigFilename = common.DefaultConfigFilename
-)
-
 // generate configfile names
 // Precedence:
 //   1) ./gompw.toml
@@ -79,7 +75,7 @@ func (c *MPConfig) LoadConfig(configFile string) error {
 	} else {
 		// walk through the standard gompw configFile(s)
 		abort := make(chan struct{})
-		ch := Gcfn(DefaultConfigFilename, os.Getenv("HOME"), abort)
+		ch := Gcfn(common.DefaultConfigFilename, os.Getenv("HOME"), abort)
 		for cf := range ch {
 			if FQfile.IsFile(cf) {
 				configFile = cf

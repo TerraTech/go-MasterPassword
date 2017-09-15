@@ -1,6 +1,5 @@
-pkg/config/userConfigFile.go:35:2:warning: exported const DefaultConfigFilename should have comment (or a comment on this block) or be unexported (golint)
-pkg/config/userConfigFile.go:38:1:warning: comment on exported function Gcfn should be of the form "Gcfn ..." (golint)
-pkg/config/userConfigFile.go:70:1:warning: exported method MPConfig.LoadConfig should have comment or be unexported (golint)
+pkg/config/userConfigFile.go:34:1:warning: comment on exported function Gcfn should be of the form "Gcfn ..." (golint)
+pkg/config/userConfigFile.go:66:1:warning: exported method MPConfig.LoadConfig should have comment or be unexported (golint)
 pkg/crypto/masterPassword.go:106:14:warning: error return value not checked (binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.fullname)))) (errcheck)
 pkg/crypto/masterPassword.go:132:14:warning: error return value not checked (binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.site)))) (errcheck)
 pkg/crypto/masterPassword.go:134:14:warning: error return value not checked (binary.Write(&buffer, binary.BigEndian, mpw.counter)) (errcheck)
