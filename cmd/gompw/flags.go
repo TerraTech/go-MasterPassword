@@ -159,7 +159,7 @@ func handleFlags(mpw *MPW) {
 	flag.StringVarP(&mpw.Config.PasswordPurpose, "purpose", "p", flagDefaults(common.DefaultPasswordPurpose, os.Getenv("MP_PWPURPOSE")), flagHelp("p"))
 	flag.StringVarP(&mpw.Config.PasswordType, "pwtype", "t", flagDefaults(common.DefaultPasswordType, os.Getenv("MP_PWTYPE")), flagHelp("t"))
 	flag.StringVarP(&mpw.pwFile, "file", "f", "", "Read user's master password from given filename")
-	flag.Uint32VarP(&mpw.Config.Counter, "counter", "c", flagDefaultCounter(common.DefaultCounter, os.Getenv("MP_SITECOUNTER")), "Site password counter value")
+	flag.Uint32VarP(&mpw.Config.Counter, "counter", "c", flagDefaultCounter(os.Getenv("MP_SITECOUNTER")), "Site password counter value")
 	flag.UintVarP(&mpw.fd, "fd", "d", 0, "Read user's master password from given file descriptor")
 
 	flag.Parse()
@@ -224,7 +224,7 @@ func flagDefaults(_default string, overrides ...string) string {
 	return _default
 }
 
-func flagDefaultCounter(_default uint32, override string) uint32 {
+func flagDefaultCounter(override string) uint32 {
 	if override != "" {
 		mpsc, err := strconv.Atoi(override)
 		if err != nil {
@@ -234,5 +234,5 @@ func flagDefaultCounter(_default uint32, override string) uint32 {
 		return uint32(mpsc)
 	}
 
-	return _default
+	return common.DefaultCounter
 }
