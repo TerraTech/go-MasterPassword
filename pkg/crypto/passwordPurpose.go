@@ -71,8 +71,8 @@ var (
 //   NOTE: Authentication is perturbed by counter, whereas the others are not.
 type PasswordPurpose int
 
-func (p *PasswordPurpose) String() string {
-	switch *p {
+func (pp *PasswordPurpose) String() string {
+	switch *pp {
 	case PasswordPurposeAuthentication:
 		return "Authentication"
 	case PasswordPurposeIdentification:
