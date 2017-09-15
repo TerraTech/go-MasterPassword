@@ -29,14 +29,11 @@ import (
 	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
 )
 
+// These vars are used for building the version string, with some injected via Makefile
 var (
-	// PROG is used for building the version string
-	PROG = path.Base(os.Args[0])
-	// VERSION is filled by Makefile and used for building the version string
-	VERSION string
-	// BUILD is filled by Makefile and used for building the version string
-	BUILD = FQversion.GetBUILD()
-	// BUILDHOST is filled by Makefile and used for building the version string
+	PROG      = path.Base(os.Args[0])
+	VERSION   string
+	BUILD     = FQversion.GetBUILD()
 	BUILDHOST string
 )
 
