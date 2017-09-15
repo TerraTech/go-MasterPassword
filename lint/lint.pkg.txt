@@ -1,4 +1,3 @@
-pkg/crypto/merge.go:38:25:warning: error return value not checked (mpw.SetPasswordPurpose(c.PasswordPurpose)) (errcheck)
 pkg/crypto/passwordPurpose.go:101:1:warning: receiver name pp should be consistent with previous receiver name p for PasswordPurpose (golint)
 pkg/crypto/passwordPurpose.go:29:7:warning: exported const DefaultPasswordPurpose should have comment or be unexported (golint)
 pkg/crypto/passwordPurpose.go:32:2:warning: exported const PasswordPurposeUnSet should have comment (or a comment on this block) or be unexported (golint)
