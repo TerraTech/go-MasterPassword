@@ -98,7 +98,7 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 	Dbg("-- mpw_masterKey (algorithm: 3)")
 	Dbg("fullName: %s", mpw.fullname)
 	Dbg("password: %s", mpw.password)
-	Dbg("masterPassword.id: %s", mpwIdBuf([]byte(mpw.password)))
+	Dbg("masterPassword.id: %s", mpwIDBuf([]byte(mpw.password)))
 	Dbg("keyScope: %s", mpw.masterPasswordSeed)
 	Dbg("masterKeySalt: keyScope=%s | #fullName=%08X | fullName=%s", mpw.masterPasswordSeed, len(mpw.fullname), mpw.fullname)
 
@@ -112,14 +112,14 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 	buffer.WriteString(mpw.fullname)
 
 	salt := buffer.Bytes()
-	Dbg("  => masterKeySalt.id: %s", mpwIdBuf(salt))
+	Dbg("  => masterKeySalt.id: %s", mpwIDBuf(salt))
 
 	key, err := scrypt.Key([]byte(mpw.password), salt, 32768, 8, 2, 64)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate password: %s", err)
 	}
 	Dbg("masterKey: scrypt( masterPassword, masterKeySalt, N=32768, r=8, p=2, keyLen=64")
-	Dbg("  => masterKey.id: %s", mpwIdBuf(key))
+	Dbg("  => masterKey.id: %s", mpwIDBuf(key))
 
 	Dbg("-- mpw_siteKey (algorithm: 3)")
 	Dbg("siteName: %s", mpw.site)
@@ -141,15 +141,15 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 	if err = binary.Write(&buffer, binary.BigEndian, mpw.counter); err != nil {
 		return "", err
 	}
-	Dbg("  => siteSalt.id: %s", mpwIdBuf(buffer.Bytes()))
+	Dbg("  => siteSalt.id: %s", mpwIDBuf(buffer.Bytes()))
 
-	Dbg("siteKey: hmac-sha256( masterKey.id=%s, siteSalt )", mpwIdBuf(key))
+	Dbg("siteKey: hmac-sha256( masterKey.id=%s, siteSalt )", mpwIDBuf(key))
 	var hmacv = hmac.New(sha256.New, key)
 	if _, err = hmacv.Write(buffer.Bytes()); err != nil {
 		return "", err
 	}
 	var seed = hmacv.Sum(nil)
-	Dbg("  => siteKey.id: %s", mpwIdBuf(seed))
+	Dbg("  => siteKey.id: %s", mpwIDBuf(seed))
 
 	var temp = templates[int(seed[0])%len(templates)]
 

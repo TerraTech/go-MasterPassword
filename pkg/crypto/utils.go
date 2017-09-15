@@ -26,7 +26,7 @@ import (
 )
 
 // mpw_id_buf()
-func mpwIdBuf(buf []byte) string {
+func mpwIDBuf(buf []byte) string {
 	sum := sha256.Sum256(buf)
 
 	return fmt.Sprintf("%02X", sum)
