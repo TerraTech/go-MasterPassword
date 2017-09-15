@@ -77,7 +77,7 @@ var (
 func (m *MasterPW) GetPasswordTypes() []string {
 	keys := make([]string, len(passwordTypeTemplates))
 	i := 0
-	for k, _ := range passwordTypeTemplates {
+	for k := range passwordTypeTemplates {
 		keys[i] = k
 		i++
 	}
