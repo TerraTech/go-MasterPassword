@@ -3,8 +3,9 @@ VERSION := $(shell git describe --tags --dirty)
 export CLI := gompw
 ORG_PATH := github.com/TerraTech
 REPO_PATH := $(ORG_PATH)/$(PROJ)
+REPO_DIR := $(GOPATH)/src/$(REPO_PATH)
 CMD_PATH := $(REPO_PATH)/cmd
-LINT_PATH := $(REPO_PATH)/lint
+LINT_PATH := $(REPO_DIR)/lint
 export PATH := $(PWD)/bin:$(PATH)
 
 FQGOLIBS_PATH := $(GOPATH)/src/futurequest.net/FQgolibs-Public/
@@ -60,9 +61,17 @@ vet:
 fmt:
 	@go fmt $(shell go list ./... | grep -v '/vendor/')
 
+LINT_OPTS := --enable-all --disable=lll
+.PHONY: lintcmd
+lintcmd:
+	@gometalinter $(LINT_OPTS) cmd/... | sort | tee $(LINT_PATH)/lint.cmd.txt
+
+.PHONY: lintpkg
+lintpkg:
+	@gometalinter $(LINT_OPTS) --concurrency=1 pkg/... | sort | tee $(LINT_PATH)/lint.pkg.txt
+
 .PHONY: lint
-lint:
-	@gometalinter --enable-all --disable=lll cmd/... pkg/... | tee $(LINT_PATH)/lint.txt
+lint: lintcmd lintpkg
 
 .PHONY: clean
 clean:
