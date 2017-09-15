@@ -61,17 +61,18 @@ vet:
 fmt:
 	@go fmt $(shell go list ./... | grep -v '/vendor/')
 
-LINT_OPTS := --enable-all --disable=lll --cyclo-over=15
+#test and testify runs the crypto tests which OOM the system
+LINT_OPTS := --enable-all --disable=lll --disable=test --disable=testify --cyclo-over=15
 .PHONY: lintcmd
 lintcmd:
 	@gometalinter $(LINT_OPTS) cmd/... | sort | tee $(LINT_PATH)/lint.cmd.txt
 
 .PHONY: lintpkg
 lintpkg:
-	@gometalinter $(LINT_OPTS) --concurrency=1 pkg/... | sort | tee $(LINT_PATH)/lint.pkg.txt
+	@gometalinter $(LINT_OPTS) pkg/... | sort | tee $(LINT_PATH)/lint.pkg.txt
 
-.PHONY: lint
-lint: lintcmd lintpkg
+.PHONY: lintall
+lintall: lintcmd lintpkg
 
 .PHONY: clean
 clean:
