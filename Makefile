@@ -61,7 +61,7 @@ vet:
 fmt:
 	@go fmt $(shell go list ./... | grep -v '/vendor/')
 
-LINT_OPTS := --enable-all --disable=lll
+LINT_OPTS := --enable-all --disable=lll --cyclo-over=15
 .PHONY: lintcmd
 lintcmd:
 	@gometalinter $(LINT_OPTS) cmd/... | sort | tee $(LINT_PATH)/lint.cmd.txt
