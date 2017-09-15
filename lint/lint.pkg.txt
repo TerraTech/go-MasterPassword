@@ -1,1 +1,0 @@
-pkg/debug/debug.go:83:1:warning: exported method Debug.SetFilename should have comment or be unexported (golint)

@@ -80,6 +80,7 @@ func (d *Debug) DbgO(format string, a ...interface{}) {
 	logIt(format, a...)
 }
 
+// SetFilename appends given filepath to Debug's stored file list
 func (d *Debug) SetFilename(f string) {
 	// Stores the filename normalized
 	d.files = append(d.files, normalize(f))
