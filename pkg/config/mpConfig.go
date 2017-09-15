@@ -24,6 +24,7 @@ import (
 	"github.com/TerraTech/go-MasterPassword/pkg/common"
 )
 
+// Defaults for new MPConfig structs
 const (
 	DefaultCounter      = common.DefaultCounter
 	DefaultPasswordType = common.DefaultPasswordType
