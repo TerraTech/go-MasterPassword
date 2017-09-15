@@ -26,16 +26,9 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-
-	"futurequest.net/FQgolibs/FQdebug"
 )
 
 var globalDebug *Debug
-
-var (
-	D        = FQdebug.D
-	MP_DEBUG string
-)
 
 type Debug struct {
 	enabled bool
