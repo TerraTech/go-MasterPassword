@@ -1,6 +1,4 @@
-cmd/gompw/flags.go:38::warning: cyclomatic complexity 32 of function handleFlags() is high (> 15) (gocyclo)
-cmd/gompw/flags.go:82:29:warning: parameter _default always receives 1 (unparam)
-cmd/gompw/flags.go:84::warning: declaration of "err" shadows declaration at cmd/gompw/flags.go:40 (vetshadow)
+cmd/gompw/flags.go:226:25:warning: parameter _default always receives 1 (unparam)
 cmd/gompw/main.go:33:12:warning: should omit type string from declaration of var PROG; it will be inferred from the right-hand side (golint)
 cmd/gompw/main.go:33:2:warning: exported var PROG should have comment or be unexported (golint)
 cmd/gompw/main.go:35:12:warning: should omit type string from declaration of var BUILD; it will be inferred from the right-hand side (golint)
