@@ -1,5 +1,1 @@
-pkg/debug/debug.go:33:6:warning: exported type Debug should have comment or be unexported (golint)
-pkg/debug/debug.go:47:1:warning: exported function NewDebug should have comment or be unexported (golint)
-pkg/debug/debug.go:58:1:warning: exported method Debug.Dbg should have comment or be unexported (golint)
-pkg/debug/debug.go:75:1:warning: exported method Debug.DbgO should have comment or be unexported (golint)
-pkg/debug/debug.go:79:1:warning: exported method Debug.SetFilename should have comment or be unexported (golint)
+pkg/debug/debug.go:83:1:warning: exported method Debug.SetFilename should have comment or be unexported (golint)

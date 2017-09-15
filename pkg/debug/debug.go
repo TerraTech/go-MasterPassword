@@ -30,6 +30,7 @@ import (
 
 var globalDebug *Debug
 
+// Debug provides access to the debugging methods
 type Debug struct {
 	enabled bool
 	files   []string
@@ -44,6 +45,7 @@ func init() {
 	}
 }
 
+// NewDebug returns a cached Debug struct
 func NewDebug() *Debug {
 	if globalDebug != nil {
 		return globalDebug
@@ -55,6 +57,7 @@ func NewDebug() *Debug {
 	return globalDebug
 }
 
+// Dbg only outputs if debugging is in effect
 func (d *Debug) Dbg(format string, a ...interface{}) {
 	if !d.enabled {
 		return
@@ -72,6 +75,7 @@ func (d *Debug) Dbg(format string, a ...interface{}) {
 	logIt(format, a...)
 }
 
+// DbgO (O is override) will output regardless if debugging is in effect or not
 func (d *Debug) DbgO(format string, a ...interface{}) {
 	logIt(format, a...)
 }
