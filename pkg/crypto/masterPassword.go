@@ -38,10 +38,11 @@ import (
 // MpwSeries denotes the mpw cli client version compatibility.
 const MpwSeries = "2.6"
 
-// MasterPasswordSeed is the default seed and allows it to be compatible with
+// DefaultMasterPasswordSeed is the default seed and allows it to be compatible with
 // http://masterpasswordapp.com/algorithm.html
 const DefaultMasterPasswordSeed = common.DefaultMasterPasswordSeed
 
+// Debugging helpers
 var (
 	Dbg  = debug.NewDebug().Dbg
 	DbgO = debug.NewDebug().DbgO
