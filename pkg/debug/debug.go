@@ -30,7 +30,8 @@ import (
 
 var globalDebug *Debug
 
-// Debug provides access to the debugging methods
+// Debug provides access to the debugging methods.
+// It provides for scoped logging based on file suffix matching.
 type Debug struct {
 	enabled bool
 	files   []string
