@@ -1,2 +1,0 @@
-cmd/gompw/utils.go:56:1:warning: readPassword is unused (deadcode)
-cmd/gompw/utils.go:56:6:warning: func readPassword is unused (U1000) (megacheck)

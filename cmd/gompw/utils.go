@@ -53,10 +53,6 @@ func listPasswordTypes(m *mpw) {
 	fmt.Println(strings.Join(m.GetPasswordTypes(), "\n"))
 }
 
-func readPassword(fd uintptr) ([]byte, error) {
-	return terminal.ReadPassword(int(fd))
-}
-
 func showVersion() {
 	if BUILDHOST == "" {
 		// If built via Makefile
