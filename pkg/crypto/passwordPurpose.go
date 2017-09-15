@@ -22,12 +22,9 @@ package crypto
 
 import (
 	"errors"
-
-	"github.com/TerraTech/go-MasterPassword/pkg/common"
 )
 
-const DefaultPasswordPurpose = common.DefaultPasswordPurpose
-
+// PasswordPurpose lookup tokens
 const (
 	PasswordPurposeUnSet PasswordPurpose = iota
 	PasswordPurposeAuthentication
@@ -35,6 +32,7 @@ const (
 	PasswordPurposeRecovery
 )
 
+// PasswordPurpose exported errors
 var (
 	ErrPasswordPurposeEmpty             = errors.New("Site password purpose must be set")
 	ErrPasswordPurposeInvalid           = errors.New("Invalid site password purpose")

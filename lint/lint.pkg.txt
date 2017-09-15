@@ -1,7 +1,4 @@
-pkg/crypto/passwordPurpose.go:29:7:warning: exported const DefaultPasswordPurpose should have comment or be unexported (golint)
-pkg/crypto/passwordPurpose.go:32:2:warning: exported const PasswordPurposeUnSet should have comment (or a comment on this block) or be unexported (golint)
-pkg/crypto/passwordPurpose.go:39:2:warning: exported var ErrPasswordPurposeEmpty should have comment or be unexported (golint)
-pkg/crypto/passwordPurpose.go:87:1:warning: comment on exported method MasterPW.SetPasswordPurpose should be of the form "SetPasswordPurpose ..." (golint)
+pkg/crypto/passwordPurpose.go:85:1:warning: comment on exported method MasterPW.SetPasswordPurpose should be of the form "SetPasswordPurpose ..." (golint)
 pkg/crypto/passwordTypeTemplates.go:1::warning: file is not gofmted with -s (gofmt)
 pkg/crypto/passwordTypeTemplates.go:80:9:warning: should omit 2nd value from range; this loop is equivalent to `for k := range ...` (golint)
 pkg/crypto/setters.go:67:1:warning: comment on exported method MasterPW.SetSite should be of the form "SetSite ..." (golint)
