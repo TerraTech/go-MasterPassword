@@ -176,7 +176,9 @@ func MasterPassword(mpwseed, passwordType, passwordPurpose, fullname, password, 
 		counter:            counter,
 	}
 	// needs to be set via method for validation
-	mpw.SetPasswordPurpose(passwordPurpose)
+	if err := mpw.SetPasswordPurpose(passwordPurpose); err != nil {
+		return "", err
+	}
 
 	return mpw.MasterPassword()
 }
