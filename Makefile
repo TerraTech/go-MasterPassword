@@ -69,7 +69,9 @@ lintcmd:
 
 .PHONY: lintpkg
 lintpkg:
-	@gometalinter $(LINT_OPTS) pkg/... | sort | tee $(LINT_PATH)/lint.pkg.txt
+	@gometalinter $(LINT_OPTS) \
+		-e "warning: duplicate of pkg/crypto/masterPassword_test.go" \
+		pkg/... | sort | tee $(LINT_PATH)/lint.pkg.txt
 
 .PHONY: lintall
 lintall: lintcmd lintpkg

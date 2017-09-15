@@ -1,7 +1,3 @@
-pkg/crypto/masterPassword_test.go:117::warning: duplicate of pkg/crypto/masterPassword_test.go:128-138 (dupl)
-pkg/crypto/masterPassword_test.go:128::warning: duplicate of pkg/crypto/masterPassword_test.go:139-149 (dupl)
-pkg/crypto/masterPassword_test.go:139::warning: duplicate of pkg/crypto/masterPassword_test.go:174-184 (dupl)
-pkg/crypto/masterPassword_test.go:174::warning: duplicate of pkg/crypto/masterPassword_test.go:117-127 (dupl)
 pkg/crypto/merge.go:38:25:warning: error return value not checked (mpw.SetPasswordPurpose(c.PasswordPurpose)) (errcheck)
 pkg/crypto/passwordPurpose.go:101:1:warning: receiver name pp should be consistent with previous receiver name p for PasswordPurpose (golint)
 pkg/crypto/passwordPurpose.go:29:7:warning: exported const DefaultPasswordPurpose should have comment or be unexported (golint)
