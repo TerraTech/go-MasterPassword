@@ -25,13 +25,11 @@ import (
 	"log"
 	"strings"
 
-	"futurequest.net/FQgolibs/FQdebug"
 	"futurequest.net/FQgolibs/FQversion"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
 var (
-	D        = FQdebug.D
 	MP_DEBUG bool
 )
 
