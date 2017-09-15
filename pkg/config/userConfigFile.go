@@ -64,6 +64,7 @@ func Gcfn(f, home string, abort <-chan struct{}) <-chan string {
 	return ch
 }
 
+// LoadConfig will load and toml.Unmarshal the given configFile
 func (c *MPConfig) LoadConfig(configFile string) error {
 	var t []byte
 	var err error
