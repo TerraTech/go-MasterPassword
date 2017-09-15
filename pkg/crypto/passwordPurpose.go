@@ -82,7 +82,7 @@ func (pp *PasswordPurpose) String() string {
 	return ""
 }
 
-// SetPurpose sets the MasterPassword's generated password purpose
+// SetPasswordPurpose sets the MasterPassword's generated password purpose
 func (mpw *MasterPW) SetPasswordPurpose(purpose string) (err error) {
 	if err = ValidatePasswordPurpose(purpose); err == nil {
 		mpw.passwordPurpose = ppmap[purpose]
