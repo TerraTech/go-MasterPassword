@@ -1,4 +1,3 @@
-pkg/crypto/validate.go:28:2:warning: exported var ErrCounter should have comment or be unexported (golint)
 pkg/debug/debug.go:36:2:warning: exported var D should have comment or be unexported (golint)
 pkg/debug/debug.go:37:2:warning: don't use ALL_CAPS in Go names; use CamelCase (golint)
 pkg/debug/debug.go:40:6:warning: exported type Debug should have comment or be unexported (golint)
