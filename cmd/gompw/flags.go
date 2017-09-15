@@ -133,10 +133,12 @@ func handleFlags(mpw *MPW) {
 
 	// -c ( >1 ) does not work with -p [i,r] (or -p [!a])
 	if mpw.Config.Counter > 1 && flag.ShorthandLookup("c").Changed && flag.ShorthandLookup("p").Changed {
-		if err := crypto.ValidatePasswordPurpose(mpw.Config.PasswordPurpose); err != nil {
+		if err = crypto.ValidatePasswordPurpose(mpw.Config.PasswordPurpose); err != nil {
 			fatal(err.Error())
 		}
-		token, err := crypto.PasswordPurposeToToken(mpw.Config.PasswordPurpose)
+
+		var token crypto.PasswordPurpose
+		token, err = crypto.PasswordPurposeToToken(mpw.Config.PasswordPurpose)
 		if err != nil {
 			fatal(err.Error())
 		}
@@ -147,7 +149,7 @@ func handleFlags(mpw *MPW) {
 
 	// prime the pump
 	if !ignoreConfigFile {
-		err := mpw.cu.LoadConfig(configFile)
+		err = mpw.cu.LoadConfig(configFile)
 		if err != nil {
 			fatal(err.Error())
 		}
@@ -157,7 +159,8 @@ func handleFlags(mpw *MPW) {
 	}
 
 	getResponse := func(prompt, errMsg string) string {
-		input, err := readInput(prompt, mpw.ssp)
+		var input string
+		input, err = readInput(prompt, mpw.ssp)
 		if err != nil {
 			fatal(err.Error())
 		}
