@@ -31,7 +31,8 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
-// generate configfile names
+// Gcfn generates standard locations of configFile filepaths
+//
 // Precedence:
 //   1) ./gompw.toml
 //   2) $HOME/.gompw.toml
