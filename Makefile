@@ -4,6 +4,7 @@ export CLI := gompw
 ORG_PATH := github.com/TerraTech
 REPO_PATH := $(ORG_PATH)/$(PROJ)
 CMD_PATH := $(REPO_PATH)/cmd
+LINT_PATH := $(REPO_PATH)/lint
 export PATH := $(PWD)/bin:$(PATH)
 
 FQGOLIBS_PATH := $(GOPATH)/src/futurequest.net/FQgolibs-Public/
@@ -58,6 +59,10 @@ vet:
 .PHONY: fmt
 fmt:
 	@go fmt $(shell go list ./... | grep -v '/vendor/')
+
+.PHONY: lint
+lint:
+	@gometalinter --enable-all --disable=lll cmd/... pkg/... | tee $(LINT_PATH)/lint.txt
 
 .PHONY: clean
 clean:
