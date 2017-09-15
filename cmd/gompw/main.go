@@ -40,7 +40,7 @@ var (
 	BUILDHOST string
 )
 
-type MPW struct {
+type mpw struct {
 	*crypto.MasterPW
 	cu     *config.MPConfig // (MP)Config User, loaded from .toml files
 	fd     uint
@@ -49,7 +49,7 @@ type MPW struct {
 }
 
 func main() {
-	mpw := &MPW{
+	mpw := &mpw{
 		MasterPW: crypto.NewMasterPassword(),
 		cu:       &config.MPConfig{},
 	}

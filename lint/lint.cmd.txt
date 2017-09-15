@@ -1,4 +1,3 @@
-cmd/gompw/main.go:43:6:warning: exported type MPW should have comment or be unexported (golint)
 cmd/gompw/utils.go:34:2:warning: exported var D should have comment or be unexported (golint)
 cmd/gompw/utils.go:34:2:warning: var D is unused (U1000) (megacheck)
 cmd/gompw/utils.go:35:2:warning: don't use ALL_CAPS in Go names; use CamelCase (golint)

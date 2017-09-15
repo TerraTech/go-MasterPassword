@@ -49,7 +49,7 @@ func isaTTY(fd uintptr) bool {
 	return terminal.IsTerminal(int(fd))
 }
 
-func listPasswordTypes(m *MPW) {
+func listPasswordTypes(m *mpw) {
 	fmt.Println("=Valid Password Types=")
 	fmt.Println(strings.Join(m.GetPasswordTypes(), "\n"))
 }

@@ -35,7 +35,7 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
-func (mpw *MPW) getResponse(prompt, errMsg string) string {
+func (mpw *mpw) getResponse(prompt, errMsg string) string {
 	input, err := readInput(prompt, mpw.ssp)
 	if err != nil {
 		fatal(err.Error())
@@ -47,13 +47,13 @@ func (mpw *MPW) getResponse(prompt, errMsg string) string {
 	return input
 }
 
-func (mpw *MPW) handleFullname() {
+func (mpw *mpw) handleFullname() {
 	if mpw.Config.Fullname == "" {
 		mpw.Config.Fullname = mpw.getResponse("Your full name: ", "Fullname must be specified")
 	}
 }
 
-func (mpw *MPW) handlePassword() {
+func (mpw *mpw) handlePassword() {
 	var err error
 	var pwBytes []byte
 	var pwInput io.Reader
@@ -96,7 +96,7 @@ func (mpw *MPW) handlePassword() {
 	}
 }
 
-func (mpw *MPW) handleSite() {
+func (mpw *mpw) handleSite() {
 	// handle site
 	site := flagDefaults("", flag.Arg(0), os.Getenv("MP_SITE"))
 	if site == "" {
@@ -105,7 +105,7 @@ func (mpw *MPW) handleSite() {
 	mpw.Config.Site = site
 }
 
-func (mpw *MPW) handleUserConfigLoading(configFile string) {
+func (mpw *mpw) handleUserConfigLoading(configFile string) {
 	err := mpw.cu.LoadConfig(configFile)
 	if err != nil {
 		fatal(err.Error())
@@ -115,7 +115,7 @@ func (mpw *MPW) handleUserConfigLoading(configFile string) {
 	mpw.Config.Merge(mpw.cu)
 }
 
-func handleFlags(mpw *MPW) {
+func handleFlags(mpw *mpw) {
 	var configFile string
 	var err error
 	var flagListPasswordTypes bool
