@@ -22,12 +22,9 @@ package crypto
 
 import (
 	"errors"
-
-	"github.com/TerraTech/go-MasterPassword/pkg/common"
 )
 
-const DefaultPasswordPurpose = common.DefaultPasswordPurpose
-
+// PasswordPurpose lookup tokens
 const (
 	PasswordPurposeUnSet PasswordPurpose = iota
 	PasswordPurposeAuthentication
@@ -35,6 +32,7 @@ const (
 	PasswordPurposeRecovery
 )
 
+// PasswordPurpose exported errors
 var (
 	ErrPasswordPurposeEmpty             = errors.New("Site password purpose must be set")
 	ErrPasswordPurposeInvalid           = errors.New("Invalid site password purpose")
@@ -71,8 +69,8 @@ var (
 //   NOTE: Authentication is perturbed by counter, whereas the others are not.
 type PasswordPurpose int
 
-func (p *PasswordPurpose) String() string {
-	switch *p {
+func (pp *PasswordPurpose) String() string {
+	switch *pp {
 	case PasswordPurposeAuthentication:
 		return "Authentication"
 	case PasswordPurposeIdentification:
@@ -84,7 +82,7 @@ func (p *PasswordPurpose) String() string {
 	return ""
 }
 
-// SetPurpose sets the MasterPassword's generated password purpose
+// SetPasswordPurpose sets the MasterPassword's generated password purpose
 func (mpw *MasterPW) SetPasswordPurpose(purpose string) (err error) {
 	if err = ValidatePasswordPurpose(purpose); err == nil {
 		mpw.passwordPurpose = ppmap[purpose]

@@ -25,14 +25,14 @@ import (
 )
 
 // fields2Merge is a validation map of all MPConfig fields that will be merged
-type fields2Merge_t map[string]struct{}
+type fields2MergeT map[string]struct{}
 
 var (
 	// testFields2Merge is used for test overrides
-	testFields2Merge    fields2Merge_t
-	defaultFields2Merge = func() fields2Merge_t {
+	testFields2Merge    fields2MergeT
+	defaultFields2Merge = func() fields2MergeT {
 		// use a func() to ensure it stays pristine on invocation during tests
-		return fields2Merge_t{
+		return fields2MergeT{
 			"MasterPasswordSeed": struct{}{},
 			"PasswordType":       struct{}{},
 			"Fullname":           struct{}{},

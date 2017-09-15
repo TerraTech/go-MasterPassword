@@ -23,20 +23,19 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
-	"futurequest.net/FQgolibs/FQdebug"
 	"futurequest.net/FQgolibs/FQversion"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
 var (
-	D        = FQdebug.D
-	MP_DEBUG bool
+	mpDebug = os.Getenv("MP_DEBUG") != ""
 )
 
-func DEBUG(msg string) {
-	if MP_DEBUG {
+func debug(msg string) {
+	if mpDebug {
 		log.Printf("[DEBUG] %s", msg)
 	}
 }
@@ -49,13 +48,9 @@ func isaTTY(fd uintptr) bool {
 	return terminal.IsTerminal(int(fd))
 }
 
-func listPasswordTypes(m *MPW) {
+func listPasswordTypes(m *mpw) {
 	fmt.Println("=Valid Password Types=")
 	fmt.Println(strings.Join(m.GetPasswordTypes(), "\n"))
-}
-
-func readPassword(fd uintptr) ([]byte, error) {
-	return terminal.ReadPassword(int(fd))
 }
 
 func showVersion() {

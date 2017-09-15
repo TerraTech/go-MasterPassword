@@ -38,10 +38,11 @@ import (
 // MpwSeries denotes the mpw cli client version compatibility.
 const MpwSeries = "2.6"
 
-// MasterPasswordSeed is the default seed and allows it to be compatible with
+// DefaultMasterPasswordSeed is the default seed and allows it to be compatible with
 // http://masterpasswordapp.com/algorithm.html
 const DefaultMasterPasswordSeed = common.DefaultMasterPasswordSeed
 
+// Debugging helpers
 var (
 	Dbg  = debug.NewDebug().Dbg
 	DbgO = debug.NewDebug().DbgO
@@ -70,13 +71,15 @@ func NewMasterPassword() *MasterPW {
 //
 //   Valid PasswordTypes: basic, long, maximum, medium, name, phrase, pin, short
 func (mpw *MasterPW) MasterPassword() (string, error) {
+	var err error
+
 	// Fixup MasterPasswordSeed if ""
 	if mpw.masterPasswordSeed == "" && mpw.Config.MasterPasswordSeed == "" {
 		mpw.Config.MasterPasswordSeed = DefaultMasterPasswordSeed
 	}
 
 	// merge (and validate) Config ==> MasterPW
-	if err := mpw.MergeConfig(); err != nil {
+	if err = mpw.MergeConfig(); err != nil {
 		return "", err
 	}
 
@@ -95,7 +98,7 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 	Dbg("-- mpw_masterKey (algorithm: 3)")
 	Dbg("fullName: %s", mpw.fullname)
 	Dbg("password: %s", mpw.password)
-	Dbg("masterPassword.id: %s", mpwIdBuf([]byte(mpw.password)))
+	Dbg("masterPassword.id: %s", mpwIDBuf([]byte(mpw.password)))
 	Dbg("keyScope: %s", mpw.masterPasswordSeed)
 	Dbg("masterKeySalt: keyScope=%s | #fullName=%08X | fullName=%s", mpw.masterPasswordSeed, len(mpw.fullname), mpw.fullname)
 
@@ -103,18 +106,20 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 
 	var buffer bytes.Buffer
 	buffer.WriteString(mpw.masterPasswordSeed)
-	binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.fullname)))
+	if err = binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.fullname))); err != nil {
+		return "", err
+	}
 	buffer.WriteString(mpw.fullname)
 
 	salt := buffer.Bytes()
-	Dbg("  => masterKeySalt.id: %s", mpwIdBuf(salt))
+	Dbg("  => masterKeySalt.id: %s", mpwIDBuf(salt))
 
 	key, err := scrypt.Key([]byte(mpw.password), salt, 32768, 8, 2, 64)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate password: %s", err)
 	}
 	Dbg("masterKey: scrypt( masterPassword, masterKeySalt, N=32768, r=8, p=2, keyLen=64")
-	Dbg("  => masterKey.id: %s", mpwIdBuf(key))
+	Dbg("  => masterKey.id: %s", mpwIDBuf(key))
 
 	Dbg("-- mpw_siteKey (algorithm: 3)")
 	Dbg("siteName: %s", mpw.site)
@@ -129,16 +134,22 @@ func (mpw *MasterPW) MasterPassword() (string, error) {
 	// Danger Will Robinson, passwordPurpose comes into effect here, so caution with the Truncate()
 	buffer.Truncate(len(mpw.masterPasswordSeed))
 	buffer.WriteString(mpw.purpose()) // add the passwordPurpose suffix
-	binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.site)))
+	if err = binary.Write(&buffer, binary.BigEndian, uint32(len(mpw.site))); err != nil {
+		return "", err
+	}
 	buffer.WriteString(mpw.site)
-	binary.Write(&buffer, binary.BigEndian, mpw.counter)
-	Dbg("  => siteSalt.id: %s", mpwIdBuf(buffer.Bytes()))
+	if err = binary.Write(&buffer, binary.BigEndian, mpw.counter); err != nil {
+		return "", err
+	}
+	Dbg("  => siteSalt.id: %s", mpwIDBuf(buffer.Bytes()))
 
-	Dbg("siteKey: hmac-sha256( masterKey.id=%s, siteSalt )", mpwIdBuf(key))
+	Dbg("siteKey: hmac-sha256( masterKey.id=%s, siteSalt )", mpwIDBuf(key))
 	var hmacv = hmac.New(sha256.New, key)
-	hmacv.Write(buffer.Bytes())
+	if _, err = hmacv.Write(buffer.Bytes()); err != nil {
+		return "", err
+	}
 	var seed = hmacv.Sum(nil)
-	Dbg("  => siteKey.id: %s", mpwIdBuf(seed))
+	Dbg("  => siteKey.id: %s", mpwIDBuf(seed))
 
 	var temp = templates[int(seed[0])%len(templates)]
 
@@ -166,7 +177,9 @@ func MasterPassword(mpwseed, passwordType, passwordPurpose, fullname, password, 
 		counter:            counter,
 	}
 	// needs to be set via method for validation
-	mpw.SetPasswordPurpose(passwordPurpose)
+	if err := mpw.SetPasswordPurpose(passwordPurpose); err != nil {
+		return "", err
+	}
 
 	return mpw.MasterPassword()
 }

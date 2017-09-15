@@ -31,11 +31,8 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
-const (
-	DefaultConfigFilename = common.DefaultConfigFilename
-)
-
-// generate configfile names
+// Gcfn generates standard locations of configFile filepaths
+//
 // Precedence:
 //   1) ./gompw.toml
 //   2) $HOME/.gompw.toml
@@ -67,6 +64,7 @@ func Gcfn(f, home string, abort <-chan struct{}) <-chan string {
 	return ch
 }
 
+// LoadConfig will load and toml.Unmarshal the given configFile
 func (c *MPConfig) LoadConfig(configFile string) error {
 	var t []byte
 	var err error
@@ -79,7 +77,7 @@ func (c *MPConfig) LoadConfig(configFile string) error {
 	} else {
 		// walk through the standard gompw configFile(s)
 		abort := make(chan struct{})
-		ch := Gcfn(DefaultConfigFilename, os.Getenv("HOME"), abort)
+		ch := Gcfn(common.DefaultConfigFilename, os.Getenv("HOME"), abort)
 		for cf := range ch {
 			if FQfile.IsFile(cf) {
 				configFile = cf

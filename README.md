@@ -1,5 +1,6 @@
 [![GoDoc](https://godoc.org/github.com/TerraTech/go-MasterPassword?status.svg)](https://godoc.org/github.com/TerraTech/go-MasterPassword)
 [![Build Status](https://www.travis-ci.org/TerraTech/go-MasterPassword.svg?branch=master)](https://www.travis-ci.org/TerraTech/go-MasterPassword)
+[![Go Report Card](https://goreportcard.com/badge/github.com/TerraTech/go-MasterPassword)](https://goreportcard.com/report/github.com/TerraTech/go-MasterPassword)
 # Go implementation of the Master Password client and library
 
 ## [Master Password •••|](http://masterpasswordapp.com)

@@ -3,7 +3,9 @@ VERSION := $(shell git describe --tags --dirty)
 export CLI := gompw
 ORG_PATH := github.com/TerraTech
 REPO_PATH := $(ORG_PATH)/$(PROJ)
+REPO_DIR := $(GOPATH)/src/$(REPO_PATH)
 CMD_PATH := $(REPO_PATH)/cmd
+LINT_PATH := $(REPO_DIR)/lint
 export PATH := $(PWD)/bin:$(PATH)
 
 FQGOLIBS_PATH := $(GOPATH)/src/futurequest.net/FQgolibs-Public/
@@ -58,6 +60,21 @@ vet:
 .PHONY: fmt
 fmt:
 	@go fmt $(shell go list ./... | grep -v '/vendor/')
+
+#test and testify runs the crypto tests which OOM the system
+LINT_OPTS := --enable-all --disable=lll --disable=test --disable=testify --cyclo-over=15
+.PHONY: lintcmd
+lintcmd:
+	@gometalinter $(LINT_OPTS) cmd/... | sort | tee $(LINT_PATH)/lint.cmd.txt
+
+.PHONY: lintpkg
+lintpkg:
+	@gometalinter $(LINT_OPTS) \
+		-e "warning: duplicate of pkg/crypto/masterPassword_test.go" \
+		pkg/... | sort | tee $(LINT_PATH)/lint.pkg.txt
+
+.PHONY: lintall
+lintall: lintcmd lintpkg
 
 .PHONY: clean
 clean:

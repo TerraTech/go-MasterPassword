@@ -24,6 +24,7 @@ import (
 	"errors"
 )
 
+// Validation exported errors
 var (
 	ErrCounter                 = errors.New("site password counter must be >= 1")
 	ErrFullnameEmpty           = errors.New("Site fullname must be set")

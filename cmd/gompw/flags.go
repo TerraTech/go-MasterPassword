@@ -35,14 +35,92 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
-func handleFlags(mpw *MPW) {
+func (mpw *mpw) getResponse(prompt, errMsg string) string {
+	input, err := readInput(prompt, mpw.ssp)
+	if err != nil {
+		fatal(err.Error())
+	}
+	if input == "" {
+		fatal(errMsg)
+	}
+
+	return input
+}
+
+func (mpw *mpw) handleFullname() {
+	if mpw.Config.Fullname == "" {
+		mpw.Config.Fullname = mpw.getResponse("Your full name: ", "Fullname must be specified")
+	}
+}
+
+func (mpw *mpw) handlePassword() {
+	var err error
+	var pwBytes []byte
+	var pwInput io.Reader
+
+	// read password from io.Reader
+	// Priority:
+	// 1) -f
+	// 2) -d
+	// 3) stdin
+	var errNoPassword = "Password must be specified"
+	if flag.ShorthandLookup("f").Changed || flag.ShorthandLookup("d").Changed {
+		if flag.ShorthandLookup("f").Changed {
+			debug("pwInput: file")
+			pwInput, err = os.Open(mpw.pwFile)
+		} else if flag.ShorthandLookup("d").Changed {
+			debug("pwInput: fd")
+			pwInput = os.NewFile(uintptr(mpw.fd), "")
+		}
+		if err != nil {
+			fatal(err.Error())
+		}
+
+		if pwInput == nil {
+			fatal("Cannot create io.Reader for password input")
+		}
+
+		pwBytes, err = ioutil.ReadAll(pwInput)
+		if err != nil {
+			fatal(err.Error())
+		}
+
+		mpw.Config.Password = string(bytes.TrimSpace(pwBytes))
+
+		if mpw.Config.Password == "" {
+			fatal(errNoPassword)
+		}
+	} else {
+		debug("pwInput: stdin")
+		mpw.Config.Password = mpw.getResponse("Your master password: ", errNoPassword)
+	}
+}
+
+func (mpw *mpw) handleSite() {
+	// handle site
+	site := flagDefaults("", flag.Arg(0), os.Getenv("MP_SITE"))
+	if site == "" {
+		site = mpw.getResponse("Site name: ", "Site must be specified")
+	}
+	mpw.Config.Site = site
+}
+
+func (mpw *mpw) handleUserConfigLoading(configFile string) {
+	err := mpw.cu.LoadConfig(configFile)
+	if err != nil {
+		fatal(err.Error())
+	}
+
+	// prime MasterPW struct with user configFile settings
+	mpw.Config.Merge(mpw.cu)
+}
+
+func handleFlags(mpw *mpw) {
 	var configFile string
 	var err error
 	var flagListPasswordTypes bool
 	var flagShowVersion bool
 	var ignoreConfigFile bool
-	var pwBytes []byte
-	var pwInput io.Reader
 
 	/* Flow of config for standard usage
 	 *  (NOTE: MasterPW.(priv-members) has full range of setters for advanced usage
@@ -70,27 +148,6 @@ func handleFlags(mpw *MPW) {
 		fmt.Println("  3) /etc/gompw.toml")
 	}
 
-	// setup our defaults
-	flagDefaults := func(_default string, overrides ...string) string {
-		for _, override := range overrides {
-			if override != "" {
-				return override
-			}
-		}
-		return _default
-	}
-	flagDefaultCounter := func(_default uint32, override string) uint32 {
-		if override != "" {
-			mpsc, err := strconv.Atoi(override)
-			if err != nil {
-				log.Print("Invalid value specified for MP_SITECOUNTER")
-				log.Fatal(err.Error())
-			}
-			return uint32(mpsc)
-		}
-		return _default
-	}
-
 	// "-v" reserved for '--verbose' if implemented
 	flag.BoolVarP(&flagListPasswordTypes, "listPasswordTypes", "l", false, "List valid Password Types")
 	flag.BoolVarP(&flagShowVersion, "version", "V", false, "Show version")
@@ -102,14 +159,10 @@ func handleFlags(mpw *MPW) {
 	flag.StringVarP(&mpw.Config.PasswordPurpose, "purpose", "p", flagDefaults(common.DefaultPasswordPurpose, os.Getenv("MP_PWPURPOSE")), flagHelp("p"))
 	flag.StringVarP(&mpw.Config.PasswordType, "pwtype", "t", flagDefaults(common.DefaultPasswordType, os.Getenv("MP_PWTYPE")), flagHelp("t"))
 	flag.StringVarP(&mpw.pwFile, "file", "f", "", "Read user's master password from given filename")
-	flag.Uint32VarP(&mpw.Config.Counter, "counter", "c", flagDefaultCounter(common.DefaultCounter, os.Getenv("MP_SITECOUNTER")), "Site password counter value")
+	flag.Uint32VarP(&mpw.Config.Counter, "counter", "c", flagDefaultCounter(os.Getenv("MP_SITECOUNTER")), "Site password counter value")
 	flag.UintVarP(&mpw.fd, "fd", "d", 0, "Read user's master password from given file descriptor")
 
 	flag.Parse()
-
-	if os.Getenv("MP_DEBUG") != "" {
-		MP_DEBUG = true
-	}
 
 	if flagShowVersion {
 		showVersion()
@@ -133,10 +186,12 @@ func handleFlags(mpw *MPW) {
 
 	// -c ( >1 ) does not work with -p [i,r] (or -p [!a])
 	if mpw.Config.Counter > 1 && flag.ShorthandLookup("c").Changed && flag.ShorthandLookup("p").Changed {
-		if err := crypto.ValidatePasswordPurpose(mpw.Config.PasswordPurpose); err != nil {
+		if err = crypto.ValidatePasswordPurpose(mpw.Config.PasswordPurpose); err != nil {
 			fatal(err.Error())
 		}
-		token, err := crypto.PasswordPurposeToToken(mpw.Config.PasswordPurpose)
+
+		var token crypto.PasswordPurpose
+		token, err = crypto.PasswordPurposeToToken(mpw.Config.PasswordPurpose)
 		if err != nil {
 			fatal(err.Error())
 		}
@@ -147,72 +202,33 @@ func handleFlags(mpw *MPW) {
 
 	// prime the pump
 	if !ignoreConfigFile {
-		err := mpw.cu.LoadConfig(configFile)
+		mpw.handleUserConfigLoading(configFile)
+	}
+
+	mpw.handleFullname()
+	mpw.handlePassword()
+	mpw.handleSite()
+}
+
+func flagDefaults(_default string, overrides ...string) string {
+	for _, override := range overrides {
+		if override != "" {
+			return override
+		}
+	}
+
+	return _default
+}
+
+func flagDefaultCounter(override string) uint32 {
+	if override != "" {
+		mpsc, err := strconv.Atoi(override)
 		if err != nil {
-			fatal(err.Error())
+			log.Print("Invalid value specified for MP_SITECOUNTER")
+			log.Fatal(err.Error())
 		}
-
-		// prime MasterPW struct with user configFile settings
-		mpw.Config.Merge(mpw.cu)
+		return uint32(mpsc)
 	}
 
-	getResponse := func(prompt, errMsg string) string {
-		input, err := readInput(prompt, mpw.ssp)
-		if err != nil {
-			fatal(err.Error())
-		}
-		if input == "" {
-			fatal(errMsg)
-		}
-
-		return input
-	}
-
-	if mpw.Config.Fullname == "" {
-		mpw.Config.Fullname = getResponse("Your full name: ", "Fullname must be specified")
-	}
-
-	// read password from io.Reader
-	// Priority:
-	// 1) -f
-	// 2) -d
-	// 3) stdin
-	var errNoPassword = "Password must be specified"
-	if flag.ShorthandLookup("f").Changed || flag.ShorthandLookup("d").Changed {
-		if flag.ShorthandLookup("f").Changed {
-			DEBUG("pwInput: file")
-			pwInput, err = os.Open(mpw.pwFile)
-		} else if flag.ShorthandLookup("d").Changed {
-			DEBUG("pwInput: fd")
-			pwInput = os.NewFile(uintptr(mpw.fd), "")
-		}
-		if err != nil {
-			fatal(err.Error())
-		}
-
-		if pwInput == nil {
-			fatal("Cannot create io.Reader for password input")
-		}
-
-		pwBytes, err = ioutil.ReadAll(pwInput)
-		if err != nil {
-			fatal(err.Error())
-		}
-
-		mpw.Config.Password = string(bytes.TrimSpace(pwBytes))
-
-		if mpw.Config.Password == "" {
-			fatal(errNoPassword)
-		}
-	} else {
-		DEBUG("pwInput: stdin")
-		mpw.Config.Password = getResponse("Your master password: ", errNoPassword)
-	}
-
-	// handle site
-	site := flagDefaults("", flag.Arg(0), os.Getenv("MP_SITE"))
-	if site == "" {
-		site = getResponse("Site name: ", "Site must be specified")
-	}
-	mpw.Config.Site = site
+	return common.DefaultCounter
 }

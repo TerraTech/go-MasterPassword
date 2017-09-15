@@ -29,14 +29,15 @@ import (
 	"github.com/TerraTech/go-MasterPassword/pkg/crypto"
 )
 
+// These vars are used for building the version string, with some injected via Makefile
 var (
-	PROG      string = path.Base(os.Args[0])
-	VERSION   string // Filled via Makefile
-	BUILD     string = FQversion.GetBUILD()
-	BUILDHOST string // Filled via Makefile
+	PROG      = path.Base(os.Args[0])
+	VERSION   string
+	BUILD     = FQversion.GetBUILD()
+	BUILDHOST string
 )
 
-type MPW struct {
+type mpw struct {
 	*crypto.MasterPW
 	cu     *config.MPConfig // (MP)Config User, loaded from .toml files
 	fd     uint
@@ -45,7 +46,7 @@ type MPW struct {
 }
 
 func main() {
-	mpw := &MPW{
+	mpw := &mpw{
 		MasterPW: crypto.NewMasterPassword(),
 		cu:       &config.MPConfig{},
 	}

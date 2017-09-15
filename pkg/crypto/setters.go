@@ -64,7 +64,7 @@ func (mpw *MasterPW) SetPasswordType(pwtype string) (err error) {
 	return
 }
 
-// SetX is a setter for MasterPW.X
+// SetSite is a setter for MasterPW.site
 func (mpw *MasterPW) SetSite(site string) (err error) {
 	if err = ValidateSite(site); err == nil {
 		mpw.site = site
