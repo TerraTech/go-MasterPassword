@@ -55,7 +55,9 @@ func TestLoadConfig(t *testing.T) {
 		Counter:            69,
 	}
 
-	err := c.LoadConfig("../../files/gompw.toml")
+	cf := "../../files/gompw.toml"
+	expected.ConfigFile = cf
+	err := c.LoadConfig(cf)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, c)
 
@@ -65,9 +67,12 @@ func TestLoadConfig(t *testing.T) {
 	expected.PasswordType = "long"
 
 	c = config.NewMPConfig()
-	err = c.LoadConfig("../../files/gompw-omitempty.toml")
+	cf = "../../files/gompw-omitempty.toml"
+	expected.ConfigFile = cf
+	err = c.LoadConfig(cf)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, c)
+	expected.ConfigFile = ""
 
 	// test against empty gompw.toml
 	expected = &config.MPConfig{
@@ -91,7 +96,9 @@ func TestMerge(t *testing.T) {
 		Counter:      1,
 	}
 
-	err := c.LoadConfig("../../files/gompw-merge.toml")
+	cf := "../../files/gompw-merge.toml"
+	expected.ConfigFile = cf
+	err := c.LoadConfig(cf)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, c)
 }

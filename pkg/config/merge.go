@@ -63,7 +63,6 @@ func (mpc *MPConfig) Merge(c *MPConfig) {
 	vNF := v.NumField()
 	// need to compensate for the added debugging fields
 	if vNF != len(fields2merge)+len(whitelisted) {
-		println(vNF, len(fields2merge))
 		panic("config.Merge mismatch with MPConfig, please check the merge actions and/or MPConfig members")
 	}
 

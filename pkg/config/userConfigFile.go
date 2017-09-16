@@ -115,7 +115,6 @@ func (c *MPConfig) LoadConfig(configFile string) error {
 	c.ConfigFile = configFile
 
 	// dump trigger set?
-	println("TT: ", c.dump)
 	if doDump {
 		err = c.Dump()
 		if err != nil {
