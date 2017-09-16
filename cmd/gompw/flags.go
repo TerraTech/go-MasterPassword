@@ -105,7 +105,11 @@ func (mpw *mpw) handleSite() {
 	mpw.Config.Site = site
 }
 
-func (mpw *mpw) handleUserConfigLoading(configFile string) {
+func (mpw *mpw) handleUserConfigLoading(configFile string, dump bool) {
+	if dump {
+		mpw.cu.SetDump(dump)
+	}
+
 	err := mpw.cu.LoadConfig(configFile)
 	if err != nil {
 		fatal(err.Error())
@@ -118,6 +122,7 @@ func (mpw *mpw) handleUserConfigLoading(configFile string) {
 func handleFlags(mpw *mpw) {
 	var configFile string
 	var err error
+	var flagDumpConfig bool
 	var flagListPasswordTypes bool
 	var flagShowVersion bool
 	var ignoreConfigFile bool
@@ -149,6 +154,7 @@ func handleFlags(mpw *mpw) {
 	}
 
 	// "-v" reserved for '--verbose' if implemented
+	flag.BoolVarP(&flagDumpConfig, "dumpConfig", "D", false, "Dump the user configuration file and exit")
 	flag.BoolVarP(&flagListPasswordTypes, "listPasswordTypes", "l", false, "List valid Password Types")
 	flag.BoolVarP(&flagShowVersion, "version", "V", false, "Show version")
 	flag.BoolVarP(&ignoreConfigFile, "ignoreUserConfig", "I", false, "Ignore user configuration file")
@@ -202,7 +208,7 @@ func handleFlags(mpw *mpw) {
 
 	// prime the pump
 	if !ignoreConfigFile {
-		mpw.handleUserConfigLoading(configFile)
+		mpw.handleUserConfigLoading(configFile, flagDumpConfig)
 	}
 
 	mpw.handleFullname()

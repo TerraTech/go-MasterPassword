@@ -53,16 +53,26 @@ func (mpc *MPConfig) Merge(c *MPConfig) {
 		fields2merge = testFields2Merge
 	}
 
+	// These are whitelisted fields used for internal debugging
+	whitelisted := map[string]bool{
+		"ConfigFile": true,
+		"dump":       true,
+	}
+
 	v := reflect.ValueOf(mpc).Elem()
 	vNF := v.NumField()
-	if vNF != len(fields2merge) {
+	// need to compensate for the added debugging fields
+	if vNF != len(fields2merge)+len(whitelisted) {
 		panic("config.Merge mismatch with MPConfig, please check the merge actions and/or MPConfig members")
 	}
 
 	for i := 0; i < vNF; i++ {
 		field := v.Type().Field(i)
 		if _, exists := fields2merge[field.Name]; !exists {
-			panic("config.Merge() would not transfer all MPConfig members due to add/del/renames")
+			if whitelisted[field.Name] {
+				continue
+			}
+			panic("config.Merge() would not transfer all MPConfig members due to add/del/renames: " + field.Name)
 		}
 	}
 

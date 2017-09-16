@@ -40,7 +40,10 @@ type MPConfig struct {
 	Fullname           string `toml:"fullname,omitempty"`
 	Password           string `toml:"password,omitempty"`
 	Site               string `toml:"site,omitempty"`
+	ConfigFile         string // reordered for struct alignment
 	Counter            uint32 `toml:"counter,omitempty"` // Counter >= 1
+	//
+	dump bool
 }
 
 // NewMPConfig returns a new MPConfig with defaults set
@@ -50,4 +53,9 @@ func NewMPConfig() *MPConfig {
 		PasswordType:       DefaultPasswordType,
 		Counter:            DefaultCounter,
 	}
+}
+
+// SetDump sets a flag that will trigger LoadConfig() to dump after Unmarshal
+func (c *MPConfig) SetDump(dump bool) {
+	c.dump = dump
 }
