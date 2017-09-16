@@ -23,6 +23,7 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -101,10 +102,26 @@ func (c *MPConfig) LoadConfig(configFile string) error {
 		return nil
 	}
 
+	// stuff away c.dump since Unmarshal will clobber it
+	doDump := c.dump
+
 	// Needs pelletier/go-toml >= 4a000a21a414d139727f616a8bb97f847b1b310b
 	err = toml.Unmarshal(t, c)
 	if err != nil {
 		return err
+	}
+
+	// stuff away the configFile for Dump() usage
+	c.ConfigFile = configFile
+
+	// dump trigger set?
+	println("TT: ", c.dump)
+	if doDump {
+		err = c.Dump()
+		if err != nil {
+			log.Fatal(err)
+		}
+		os.Exit(0)
 	}
 
 	// Set the necessary defaults, since the fields will be nil on 'omitempty'
